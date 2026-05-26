@@ -26,7 +26,7 @@ class UserController extends BaseController
         // proteção: só admin pode criar admin
         if (
             $data['role'] === 'admin' &&
-            Auth()->User()->role !== 'admin'
+            Auth()->Auth::user()->role !== 'admin'
         ) {
             return $this->error('Acesso negado.', 403);
         }
