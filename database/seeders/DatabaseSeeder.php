@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             'email'    => 'joelsonmututedev@gmail.com',
             'password' => Hash::make('olamundo123'),
             'role'     => 'admin',
+            'status'   => 'active',
         ]);
     }
 }
