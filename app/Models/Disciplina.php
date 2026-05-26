@@ -28,8 +28,12 @@ class Disciplina extends Model
         return $this->belongsTo(Curso::class);
     }
 
-    public function turmas()
+    public function turma()
     {
         return $this->belongsToMany(Turma::class, 'turma_disciplina');
+    }
+    public function docentes()
+    {
+        return $this->belongsToMany(Docente::class, 'disciplina_docente');
     }
 }

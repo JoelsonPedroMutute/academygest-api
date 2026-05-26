@@ -14,6 +14,8 @@ class Aluno extends Model
     protected $fillable = [
         'user_id',
         'data_nascimento',
+        'turma_id',
+        'numero_estudante',
     ];
 
     public function scopeFiltered(Builder $query, array $filters)
@@ -34,5 +36,9 @@ class Aluno extends Model
     public function notas()
     {
         return $this->hasMany(Nota::class);
+    }
+    public function turma()
+    {
+        return $this->belongsTo(Turma::class);
     }
 }
