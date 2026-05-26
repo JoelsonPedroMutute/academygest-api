@@ -2,82 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\V1\BaseController;
+use App\Http\Requests\StoreDocenteRequest;
+use App\Http\Requests\StoreAlunoRequest;
+use App\Services\AuthService;
+use App\Services\AlunoService;
+use App\Services\DocenteService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    // ===============================
-    // FORM LOGIN
-    // ===============================
-    public function showLoginForm()
-    {
-        if (Auth::check()) {
-            return $this->redirectByRole();
-        }
+    public function __construct(
+        private AuthService $authService,
+        private DocenteService $docenteService,
+        private AlunoService $alunoService
+    ) {}
 
-        return view('auth.login');
-    }
-
-    // ===============================
-    // LOGIN
-    // ===============================
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $data = $this->authService->login(
+            $request->only('email', 'password')
+        );
 
-        $credenciais = $request->only('email', 'password');
-
-        if (!Auth::attempt($credenciais, $request->filled('remember'))) {
-            return back()
-                ->withErrors([
-                    'email' => 'Credenciais inválidas.',
-                ])
-                ->onlyInput('email');
+        if (!$data['success']) {
+            return $this->error($data['message'], 401);
         }
 
-        $request->session()->regenerate();
-
-        return $this->redirectByRole()
-            ->with('success', 'Login realizado com sucesso.');
+        return $this->success($data, 'Login realizado com sucesso.');
     }
 
-    // ===============================
-    // LOGOUT
-    // ===============================
     public function logout(Request $request)
     {
-        Auth::logout();
+        $this->authService->logout($request->user());
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()
-            ->route('auth.login')
-            ->with('success', 'Logout realizado com sucesso.');
+        return $this->success(null, 'Logout realizado com sucesso.');
     }
 
-    // ===============================
-    // REDIRECT POR ROLE
-    // ===============================
-    private function redirectByRole()
+    public function registerDocente(StoreDocenteRequest $request)
     {
-        return match (Auth::user()->role) {
+        $docente = $this->docenteService->criar(
+            $request->validated(),
+            'public'
+        );
 
-            'admin' => redirect()->route('admin.dashboard'),
+        return $this->success($docente, 'Registo enviado. Aguarda aprovação.', 201);
+    }
 
-            'docente' => redirect()->route('docente.dashboard'),
+    public function registerAluno(StoreAlunoRequest $request) // ✅ StoreAlunoRequest
+    {
+        $aluno = $this->alunoService->criar(
+            $request->validated(),
+            'public'
+        );
 
-            'aluno' => redirect()->route('aluno.dashboard'),
-
-            default => redirect()
-                ->route('auth.login')
-                ->withErrors([
-                    'email' => 'Tipo de usuário inválido.',
-                ]),
-        };
+        return $this->success($aluno, 'Aluno registado com sucesso.', 201);
     }
 }
