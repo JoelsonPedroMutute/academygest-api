@@ -3,66 +3,56 @@
 namespace App\Services;
 
 use App\Models\Docente;
-use App\Models\User;
-use App\Services\BaseService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Filters\DocenteFilter;
+use Illuminate\Support\Facades\DB;
 
 class DocenteService extends BaseService
 {
     public function __construct(
-        protected DocenteFilter $filter
+        protected DocenteFilter $filter,
+        protected UserService $userService
     ) {
         $this->model = Docente::class;
     }
+
     public function listarFiltrado(array $filtros = [])
     {
         $query = Docente::query()
-            ->with([
-                'user',
-                'disciplinas',
-                'turmas'
-            ]);
+            ->with(['user']);
 
         $this->filter->apply($query, $filtros);
 
-        return $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        return $query->latest()->paginate(10)->withQueryString();
     }
 
-    public function buscarPorUser(int $userId): Docente
+
+    public function criar(array $data, string $context = 'public'): Docente
     {
-        return Docente::with(['user'])
-            ->where('user_id', $userId)
-            ->firstOrFail();
-    }
+        return DB::transaction(function () use ($data, $context) {
 
-    //--- Sobrescreve criar ---//
+            $isAdmin = $context === 'admin';
 
-    public function criar(array $dados): Docente
-    {
-        return DB::transaction(function () use ($dados) {
-
-            $user = User::create([
-                'name'     => $dados['name'],
-                'email'    => $dados['email'],
-                'password' => Hash::make($dados['password']),
-                'tipo'     => 'docente', // ← 'tipo' conforme a tua migration
+            $user = $this->userService->criar([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => $data['password'],
+                'role'     => 'docente',
+                'telefone' => $data['telefone'] ?? null,
+                'status'   => $isAdmin ? 'active' : 'pending',
             ]);
 
             return Docente::create([
                 'user_id'         => $user->id,
-                'data_nascimento' => $dados['data_nascimento'],
-                'especialidade'   => $dados['especialidade'],
-                'telefone'        => $dados['telefone'],
+                'data_nascimento' => $data['data_nascimento'],
+                'especialidade'   => $data['especialidade'],
+                'telefone'        => $data['telefone'] ?? null,
+                'status'          => $isAdmin ? 'active' : 'pending',
+            ])->load([
+                'user'
             ]);
         });
     }
 
-    // ─── Sobrescreve atualizar ---//
 
     public function atualizar(int $id, array $dados): Docente
     {
@@ -70,21 +60,51 @@ class DocenteService extends BaseService
 
             $docente = $this->buscarPorId($id);
 
-            // 1. Primeiro actualiza o user
-            $docente->user->update([
-                'name'  => $dados['name'],
-                'email' => $dados['email'],
-            ]);
+            $this->userService->atualizar($docente->user, $dados);
 
-            // 2. Depois actualiza o docente
-            $docente->update([
-                'data_nascimento' => $dados['data_nascimento'],
-                'especialidade'   => $dados['especialidade'],
-                'telefone'        => $dados['telefone'],
-            ]);
+            $docente->update(array_filter([
+                'data_nascimento' => $dados['data_nascimento'] ?? null,
+                'especialidade'   => $dados['especialidade'] ?? null,
+                'telefone'        => $dados['telefone'] ?? null,
+            ], fn($value) => $value !== null)); // ✅ só actualiza o que veio
 
-            // 3. Um único return no fim
-            return $docente->fresh();
+            return $docente->fresh(['user']);
         });
+    }
+
+
+
+    public function buscarPorUser(int $userId): Docente
+    {
+        return Docente::with(['user'])
+            ->where('user_id', $userId)
+            ->firstOrFail();
+    }
+    public function listarPendentes()
+    {
+        return Docente::query()
+            ->whereHas('user', function ($q) {
+                $q->where('status', 'pending');
+            })
+            ->with(['user'])
+            ->latest()
+            ->paginate();
+    }
+    public function aprovar(Docente $docente): Docente
+    {
+        $docente->user->update([
+            'status' => 'active'
+        ]);
+
+        return $docente->fresh(['user']);
+    }
+
+    public function rejeitar(Docente $docente): Docente
+    {
+        $docente->user->update([
+            'status' => 'rejected'
+        ]);
+
+        return $docente->fresh(['user']);
     }
 }

@@ -3,69 +3,79 @@
 namespace App\Services;
 
 use App\Models\Nota;
-use App\Services\BaseService;
 use App\Filters\NotaFilter;
-
 
 class NotasService extends BaseService
 {
     public function __construct(
-        protected NotaFilter $filter 
-    )
-    {
-;        $this->model = Nota::class;
+        protected NotaFilter $filter
+    ) {
+        $this->model = Nota::class;
     }
+
     public function listarFiltrado(array $filtros = [])
     {
         $query = Nota::query()
-            ->with([
-                'aluno',
-                'disciplina',
-                'turma'
-            ]);
+            ->with(['aluno', 'disciplina', 'turma']);
 
         $this->filter->apply($query, $filtros);
 
-        return $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        return $query->latest()->paginate(10)->withQueryString();
     }
-
-
-    // Sobrescreve — validação de nota entre 0 e 10
     public function criar(array $dados): Nota
     {
-        if ($dados['valor'] < 0 || $dados['valor'] > 10) {
-            throw new \Exception('A nota deve ser entre 0 e 10.');
-        }
+        $nota = Nota::create([
+            'aluno_id'         => $dados['aluno_id'],
+            'disciplina_id'    => $dados['disciplina_id'],
+            'turma_id'         => $dados['turma_id'],
+            'prova_trimestral' => $dados['prova_trimestral'] ?? null,
+            'prova_semestral'  => $dados['prova_semestral']  ?? null,
+            'exame_final'      => $dados['exame_final']      ?? null,
+            'media_final'      => $this->calcularMedia($dados),
+            'situacao'         => $this->calcularSituacao($dados),
+        ]);
 
-        return parent::criar($dados);
+        return $nota;
     }
 
-    // Sobrescreve — validação de nota entre 0 e 10
     public function atualizar(int $id, array $dados): Nota
     {
-        if ($dados['valor'] < 0 || $dados['valor'] > 10) {
-            throw new \Exception('A nota deve ser entre 0 e 10.');
-        }
+        $nota = $this->buscarPorId($id);
 
-        return parent::atualizar($id, $dados);
+        $nota->update(array_filter([
+            'aluno_id'         => $dados['aluno_id']         ?? null,
+            'disciplina_id'    => $dados['disciplina_id']    ?? null,
+            'turma_id'         => $dados['turma_id']         ?? null,
+            'prova_trimestral' => $dados['prova_trimestral'] ?? null,
+            'prova_semestral'  => $dados['prova_semestral']  ?? null,
+            'exame_final'      => $dados['exame_final']      ?? null,
+            'media_final'      => $this->calcularMedia(array_merge($nota->toArray(), $dados)),
+            'situacao'         => $this->calcularSituacao(array_merge($nota->toArray(), $dados)),
+        ], fn($v) => $v !== null));
+
+        return $nota->fresh(['aluno', 'disciplina', 'turma']);
     }
 
-    // Método para calcular a média de um aluno em uma disciplina
-    public function calcularMedia(int $alunoId, int $disciplinaId): float
+    private function calcularMedia(array $dados): ?float
     {
-        $notas = Nota::where('aluno_id', $alunoId)
-            ->where('disciplina_id', $disciplinaId)->get();
-        $media = $notas->avg('valor');
-        return $media;
+        $notas = array_filter([
+            $dados['prova_trimestral'] ?? null,
+            $dados['prova_semestral']  ?? null,
+            $dados['exame_final']      ?? null,
+        ], fn($v) => $v !== null);
+
+        if (empty($notas)) return null;
+
+        return round(array_sum($notas) / count($notas), 2);
     }
-    // Método para calcular a média geral de um aluno
-    public function calcularMediaGeral(int $alunoId): float
+
+
+    private function calcularSituacao(array $dados): ?string
     {
-        $notas = Nota::where('aluno_id', $alunoId)->get();
-        $mediaGeral = $notas->avg('valor');
-        return $mediaGeral;
+        $media = $this->calcularMedia($dados);
+
+        if ($media === null) return null;
+
+        return $media >= 10 ? 'aprovado' : 'reprovado';
     }
 }

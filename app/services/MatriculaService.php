@@ -18,7 +18,6 @@ class MatriculaService extends BaseService
         $query = Matricula::query()
             ->with([
                 'aluno',
-                'curso',
                 'turma'
             ]);
 
@@ -30,17 +29,31 @@ class MatriculaService extends BaseService
             ->withQueryString();
     }
 
-    // Sobrescreve — impede matrícula duplicada
+
     public function criar(array $dados): Matricula
     {
-        if (Matricula::where('aluno_id', $dados['aluno_id'])->exists()) {
-            throw new \Exception('Este aluno já tem uma matrícula.');
-        }
-
-        return parent::criar($dados);
+        return Matricula::create([
+            'aluno_id'       => $dados['aluno_id'],
+            'turma_id'       => $dados['turma_id'],
+            'ano_letivo'     => $dados['ano_letivo']     ?? null,
+            'semestre'       => $dados['semestre']       ?? null,
+            'data_matricula' => $dados['data_matricula'] ?? now()->toDateString(),
+            'status'         => $dados['status']         ?? 'ativa',
+        ]);
     }
+    public function atualizar(int $id, array $dados): Matricula
+    {
+        $matricula = $this->buscarPorId($id);
 
-    // ❌ atualizar() removido — herda do BaseService
-    // Não há validação especial ao actualizar
-    // aluno(), turma(), curso(), disciplinas() removidos — são relações do Model
+        $matricula->update(array_filter([
+            'aluno_id'       => $dados['aluno_id']       ?? null,
+            'turma_id'       => $dados['turma_id']       ?? null,
+            'ano_letivo'     => $dados['ano_letivo']     ?? null,
+            'semestre'       => $dados['semestre']       ?? null,
+            'data_matricula' => $dados['data_matricula'] ?? null,
+            'status'         => $dados['status']         ?? null,
+        ], fn($v) => $v !== null));
+
+        return $matricula->fresh(['aluno', 'turma']);
+    }
 }

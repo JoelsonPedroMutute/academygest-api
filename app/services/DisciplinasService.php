@@ -19,7 +19,7 @@ class DisciplinasService extends BaseService
         $query = Disciplina::query()
             ->with([
                 'curso',
-                'professores'
+                'docentes'
             ]);
 
         $this->filter->apply($query, $filtros);

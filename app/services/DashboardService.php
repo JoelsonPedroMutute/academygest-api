@@ -15,7 +15,6 @@ class AdminDashboardService
         protected DocenteService $docenteService,
         protected CursoService $cursoService,
         protected TurmaService $turmaService,
-        protected AulaService $aulaService,
     ) {}
 
     public function getData(): array
@@ -28,8 +27,8 @@ class AdminDashboardService
 
             'alunos_recentes'   => $this->alunoService->recentes(5),
             'docentes_recentes' => $this->docenteService->recentes(5),
-
-            'aulas_hoje' => $this->aulaService->aulasHoje(),
+            'cursos_recentes'   => $this->cursoService->recentes(5),
+            'turmas_recentes'   => $this->turmaService->recentes(5),
         ];
     }
 }

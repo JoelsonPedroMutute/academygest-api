@@ -48,4 +48,8 @@ class CursoService extends BaseService
 
         return parent::atualizar($id, $dados);
     }
+    public   function eliminar(int $id): bool
+    {
+        return Curso::destroy($id);
+    }
 }
