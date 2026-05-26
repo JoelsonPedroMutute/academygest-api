@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Api\V1\BaseController;
 use App\Services\AdminDashboardService;
@@ -13,27 +13,22 @@ class DashboardController extends BaseController
 
     public function admin()
     {
-        $data = $this->service->getData();
+        $data = $this->service->getData('admin');
 
-        return $this->success(
-            'Dashboard carregado com sucesso.',
-            $data
-        );
+        return $this->success($data, 'Dashboard admin carregado');
     }
 
     public function docente()
     {
-        return $this->success(
-            'Dashboard do docente carregado com sucesso.',
-            $this->service->getData('docente')
-        );
+        $data = $this->service->getData('docente');
+
+        return $this->success($data, 'Dashboard docente carregado');
     }
 
     public function aluno()
     {
-        return $this->success(
-            'Dashboard do aluno carregado com sucesso.',
-            $this->service->getData('aluno')
-        );
+        $data = $this->service->getData('aluno');
+
+        return $this->success($data, 'Dashboard aluno carregado');
     }
 }
