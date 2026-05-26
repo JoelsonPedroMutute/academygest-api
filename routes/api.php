@@ -1,77 +1,110 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\AlunoController;
-use App\Http\Controllers\DocenteController;
-use App\Http\Controllers\CursoController;
-use App\Http\Controllers\TurmaController;
-use App\Http\Controllers\SalaController;
-use App\Http\Controllers\DisciplinaController;
-use App\Http\Controllers\AulaController;
-use App\Http\Controllers\NotaController;
-use App\Http\Controllers\MatriculaController;
-use App\Http\Controllers\FrequenciaController;
-use App\Http\Controllers\TurmaDisciplinaController;
+use App\Http\Controllers\Api\V1\AlunoController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\V1\CursosController;
+use App\Http\Controllers\Api\V1\DisciplinasController;
+use App\Http\Controllers\Api\V1\DocentesController;
+use App\Http\Controllers\Api\V1\MatriculasController;
+use App\Http\Controllers\Api\V1\NotasController;
+use App\Http\Controllers\Api\V1\TurmasController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// ─── Rotas públicas ──────────────────────────────────────────────────
-Route::post('/login', [AuthController::class, , 'login']);
+
+//  ROTAS PÚBLICAS
+
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// ─── Rotas protegidas ────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+// ✔SELF-SERVICE REGISTO
+Route::post('/register/aluno', [AuthController::class, 'registerAluno']);
+Route::post('/register/docente', [AuthController::class, 'registerDocente']);
+
+
+//  ROTAS PROTEGIDAS
+
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // ─── Admin ───────────────────────────────────────────────────────
-    Route::middleware('admin')
+    // TESTE TEMPORÁRIO — remove depois de confirmar que funciona
+    Route::get('/ping', function (Request $request) {
+        return response()->json([
+            'user'     => $request->user(),
+            'token_id' => $request->user()->currentAccessToken()->id
+        ]);
+    });
+
+
+    //  ADMIN
+
+    Route::middleware('role:admin')
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-            Route::get('/dashboard', [AdminDashboard::class, 'index']);
+
+            Route::get('/dashboard', [AdminDashboard::class, 'admin']);
+
+            Route::get('docentes/pending', [DocentesController::class, 'pending']);
+            Route::post('docentes/{docente}/approve', [DocentesController::class, 'approve']);
+            Route::post('docentes/{docente}/reject', [DocentesController::class, 'reject']);
             Route::apiResource('alunos', AlunoController::class);
-            Route::apiResource('docentes', DocenteController::class);
-            Route::apiResource('cursos', CursoController::class);
-            Route::apiResource('turmas', TurmaController::class);
-            Route::apiResource('salas', SalaController::class);
-            Route::apiResource('disciplinas', DisciplinaController::class);
-            Route::apiResource('aulas', AulaController::class);
-            Route::apiResource('notas', NotaController::class);
-            Route::apiResource('matriculas', MatriculaController::class);
-            Route::apiResource('frequencias', FrequenciaController::class);
-            Route::apiResource('turmas-disciplinas', TurmaDisciplinaController::class);
+            Route::apiResource('docentes', DocentesController::class);
+            Route::apiResource('cursos', CursosController::class);
+            Route::apiResource('turmas', TurmasController::class);
+            Route::apiResource('disciplinas', DisciplinasController::class);
+            Route::apiResource('notas', NotasController::class);
+            Route::apiResource('matriculas', MatriculasController::class);
         });
 
-    // ─── Docente ─────────────────────────────────────────────────────
-    Route::middleware('docente')
+
+    //  DOCENTE
+
+    Route::middleware('role:docente')
         ->prefix('docente')
         ->name('docente.')
         ->group(function () {
-            Route::get('/dashboard', [AdminDashboard::class, 'docenteDashboard']);
-            Route::apiResource('aulas', AulaController::class);
-            Route::get('notas', [NotaController::class, 'index']);
-            Route::post('notas', [NotaController::class, 'store']);
-            Route::get('turmas', [TurmaController::class, 'index']);
-            Route::get('turmas/{turma}', [TurmaController::class, 'show']);
-            Route::get('cursos', [CursoController::class, 'index']);
-            Route::get('disciplinas', [DisciplinaController::class, 'index']);
-            Route::get('perfil', [DocenteController::class, 'meuPerfil']);
-            Route::put('perfil', [DocenteController::class, 'atualizarMeuPerfil']);
+
+            Route::get('/dashboard', [AdminDashboard::class, 'docente']);
+
+            // Rotas que docente pode usar
+            Route::get('notas', [NotasController::class, 'index']);      // Listar todas notas
+            Route::post('notas', [NotasController::class, 'store']);     // Criar nota
+            Route::get('notas/{nota}', [NotasController::class, 'show']); // Ver nota específica
+
+
+            Route::get('turmas', [TurmasController::class, 'index']);
+            Route::get('turmas/{turma}', [TurmasController::class, 'show']);
+
+
+            Route::get('cursos', [CursosController::class, 'index']);
+            Route::get('disciplinas', [DisciplinasController::class, 'index']);
+
+            Route::get('perfil', [DocentesController::class, 'meuPerfil']);
+            Route::patch('perfil', [DocentesController::class, 'actualizarMeuPerfil']);
         });
 
-    // ─── Aluno ───────────────────────────────────────────────────────
-    Route::middleware('aluno')
+
+    // 🎓 ALUNO
+
+    Route::middleware('role:aluno')
         ->prefix('aluno')
         ->name('aluno.')
         ->group(function () {
-            Route::get('/dashboard', [AdminDashboard::class, 'alunoDashboard']);
+
+            Route::get('/dashboard', [AdminDashboard::class, 'aluno']);
+
             Route::get('perfil', [AlunoController::class, 'meuPerfil']);
-            Route::put('perfil', [AlunoController::class, 'atualizarMeuPerfil']);
-            Route::get('notas', [NotaController::class, 'minhasNotas']);
-            Route::get('turmas/{turma}', [TurmaController::class, 'show']);
-            Route::get('cursos', [CursoController::class, 'index']);
-            Route::get('disciplinas', [DisciplinaController::class, 'index']);
+            Route::patch('perfil', [AlunoController::class, 'atualizarMeuPerfil']);
+
+            Route::get('notas', [NotasController::class, 'minhasNotas']);
+
+            Route::get('turmas/{turma}', [TurmasController::class, 'show']);
+
+            Route::get('cursos', [CursosController::class, 'index']);
+            Route::get('disciplinas', [DisciplinasController::class, 'index']);
         });
 });
