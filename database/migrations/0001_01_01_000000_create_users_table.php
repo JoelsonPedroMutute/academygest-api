@@ -26,16 +26,15 @@ return new class extends Migration
             $table->string('bi')->unique()->nullable();
             $table->enum('genero', ['M', 'F'])->nullable();
 
-            $table->enum('role', [
-                'admin',
-                'aluno',
-                'docente'
-            ])->default('aluno');
+            $table->enum('role', ['admin', 'aluno', 'docente']);
 
             $table->enum('status', [
-                'ativo',
-                'inativo'
-            ])->default('ativo');
+                'active',     // aluno ou docente ativo
+                'inactive',
+                'pending',    // docente aguardando aprovação
+                'approved',   // docente aprovado
+                'rejected'    // docente rejeitado
+            ])->default('active');
 
             $table->rememberToken();
             $table->timestamps();

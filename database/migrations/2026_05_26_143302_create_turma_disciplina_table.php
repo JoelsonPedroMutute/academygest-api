@@ -12,25 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('turma_disciplina', function (Blueprint $table) {
-
-            $table->id();
-
             $table->foreignId('turma_id')->constrained()->cascadeOnDelete();
             $table->foreignId('disciplina_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('sala_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained()->cascadeOnDelete();
-
-            $table->date('data');
-            $table->time('hora_inicio');
-            $table->time('hora_fim');
-
-            $table->timestamps();
+            $table->primary(['turma_id', 'disciplina_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('turma_disciplina');

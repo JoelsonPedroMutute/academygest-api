@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('data_nascimento')->nullable();
             $table->string('especialidade')->nullable();
 
+
             $table->timestamps();
         });
     }

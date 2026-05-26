@@ -22,9 +22,9 @@ return new class extends Migration
             $table->unsignedSmallInteger('capacidade')->nullable();
 
             $table->enum('turno', [
-                'diurno',
-                'vespertino',
-                'noturno'
+                'Manha',
+                'Tarde',
+                'noite'
             ])->nullable();
 
             $table->timestamps();
