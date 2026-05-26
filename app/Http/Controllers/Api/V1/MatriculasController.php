@@ -17,98 +17,64 @@ class MatriculasController extends BaseController
         protected MatriculaService $matriculaService
     ) {}
 
-    /*
-    |--------------------------------------------------------------------------
-    | LISTAGEM
-    |--------------------------------------------------------------------------
-    */
+
     public function index(IndexMatriculaRequest $request)
     {
         $this->authorize('viewAny', Matricula::class);
 
-        $matriculas = $this->matriculaService->listarFiltrado(
-            $request->validated()
-        );
+        $matriculas = $this->matriculaService->listarFiltrado($request->validated());
 
-        return MatriculaResource::collection($matriculas);
+        return $this->success(
+            MatriculaResource::collection($matriculas),
+            'Matrículas listadas com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETALHE
-    |--------------------------------------------------------------------------
-    */
     public function show(Matricula $matricula)
     {
         $this->authorize('view', $matricula);
 
-        $matricula->load([
-            'aluno',
-            'curso',
-            'turma',
-        ]);
+        $matricula->load(['aluno', 'turma']);
 
-        return new MatriculaResource($matricula);
+        return $this->success(
+            new MatriculaResource($matricula),
+            'Matrícula encontrada com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CRIAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function store(StoreMatriculaRequest $request)
     {
         $this->authorize('create', Matricula::class);
 
-        $matricula = $this->matriculaService->criar(
-            $request->validated()
+        $matricula = $this->matriculaService->criar($request->validated());
+
+        $matricula->load(['aluno', 'turma']);
+
+        return $this->success(
+            new MatriculaResource($matricula),
+            'Matrícula criada com sucesso.',
+            201
         );
-
-        $matricula->load([
-            'aluno',
-            'curso',
-            'turma',
-        ]);
-
-        return new MatriculaResource($matricula);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function update(UpdateMatriculaRequest $request, Matricula $matricula)
     {
         $this->authorize('update', $matricula);
 
-        $matricula = $this->matriculaService->atualizar(
-            $matricula->id,
-            $request->validated()
+        $matricula = $this->matriculaService->atualizar($matricula->id, $request->validated());
+
+        return $this->success(
+            new MatriculaResource($matricula),
+            'Matrícula actualizada com sucesso.'
         );
-
-        $matricula->load([
-            'aluno',
-            'curso',
-            'turma',
-        ]);
-
-        return new MatriculaResource($matricula);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | REMOÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function destroy(Matricula $matricula)
     {
         $this->authorize('delete', $matricula);
 
         $this->matriculaService->deletar($matricula->id);
 
-        return $this->success(
-            'Matrícula eliminada com sucesso.'
-        );
+        return $this->success(null, 'Matrícula eliminada com sucesso.');
     }
 }

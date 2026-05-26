@@ -15,11 +15,6 @@ class CursosController extends BaseController
         protected CursoService $cursoService
     ) {}
 
-    /*
-    |--------------------------------------------------------------------------
-    | LISTAGEM
-    |--------------------------------------------------------------------------
-    */
     public function index(IndexCursoRequest $request)
     {
         $this->authorize('viewAny', Curso::class);
@@ -31,18 +26,14 @@ class CursosController extends BaseController
         return CursoResource::collection($cursos);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETALHE
-    |--------------------------------------------------------------------------
-    */
+
     public function show(Curso $curso)
     {
         $this->authorize('view', $curso);
 
         $curso->load([
             'disciplinas',
-            'turmas',
+            'turma',
         ]);
 
         return new CursoResource($curso);
@@ -63,17 +54,13 @@ class CursosController extends BaseController
 
         $curso->load([
             'disciplinas',
-            'turmas',
+            'turma',
         ]);
 
         return new CursoResource($curso);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
+
     public function update(UpdateCursoRequest $request, Curso $curso)
     {
         $this->authorize('update', $curso);
@@ -85,17 +72,13 @@ class CursosController extends BaseController
 
         $curso->load([
             'disciplinas',
-            'turmas',
+            'turma',
         ]);
 
         return new CursoResource($curso);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | REMOÇÃO
-    |--------------------------------------------------------------------------
-    */
+
     public function destroy(Curso $curso)
     {
         $this->authorize('delete', $curso);

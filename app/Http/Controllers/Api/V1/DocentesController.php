@@ -31,54 +31,40 @@ class DocentesController extends BaseController
             $request->validated()
         );
 
-        return DocenteResource::collection($docentes);
+        return $this->success(
+            DocenteResource::collection($docentes),
+            'Docentes listados com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETALHE
-    |--------------------------------------------------------------------------
-    */
     public function show(Docente $docente)
     {
         $this->authorize('view', $docente);
 
-        $docente->load([
-            'user',
-            'disciplinas',
-            'turmas',
-        ]);
+        $docente->load(['user']);
 
-        return new DocenteResource($docente);
+        return $this->success(
+            new DocenteResource($docente),
+            'Docente encontrado com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CRIAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function store(StoreDocenteRequest $request)
     {
         $this->authorize('create', Docente::class);
 
         $docente = $this->docenteService->criar(
-            $request->validated()
+            $request->validated(),
+            'admin'
         );
 
-        $docente->load([
-            'user',
-            'disciplinas',
-            'turmas',
-        ]);
-
-        return new DocenteResource($docente);
+        return $this->success(
+            new DocenteResource($docente),
+            'Docente criado com sucesso.',
+            201
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function update(UpdateDocenteRequest $request, Docente $docente)
     {
         $this->authorize('update', $docente);
@@ -88,74 +74,93 @@ class DocentesController extends BaseController
             $request->validated()
         );
 
-        $docente->load([
-            'user',
-            'disciplinas',
-            'turmas',
-        ]);
-
-        return new DocenteResource($docente);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | REMOÇÃO
-    |--------------------------------------------------------------------------
-    */
-    public function destroy(Docente $docente)
-    {
-        $this->authorize('delete', $docente);
-
-        $this->docenteService->deletar($docente->id);
+        $docente->load(['user']);
 
         return $this->success(
-            'Docente eliminado com sucesso.'
+            new DocenteResource($docente),
+            'Docente actualizado com sucesso.'
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PERFIL DO DOCENTE AUTENTICADO
-    |--------------------------------------------------------------------------
-    */
     public function meuPerfil()
     {
-        $docente = $this->docenteService->buscarPorUser(
-            Auth::id()
-        );
+        $docente = $this->docenteService->buscarPorUser(Auth::id());
 
         abort_if(!$docente, 404);
 
-        $docente->load([
-            'user',
-            'disciplinas',
-            'turmas',
-        ]);
+        $docente->load(['user']);
 
-        return new DocenteResource($docente);
+        return $this->success(
+            new DocenteResource($docente),
+            'Perfil carregado com sucesso.'
+        );
     }
-
     public function actualizarMeuPerfil(UpdateDocenteRequest $request)
     {
-        $docente = $this->docenteService->buscarPorUser(
-            Auth::id()
-        );
-
+        $docente = $this->docenteService->buscarPorUser(Auth::id());
         abort_if(!$docente, 404);
 
-        $this->authorize('update', $docente);
+        // REMOVA ESTA LINHA - não precisa pois você já tem o docente correto
+        // $this->authorize('update', $docente);
 
         $docente = $this->docenteService->atualizar(
             $docente->id,
             $request->validated()
         );
 
-        $docente->load([
-            'user',
-            'disciplinas',
-            'turmas',
+        $docente->load(['user']);
+
+        return $this->success(
+            new DocenteResource($docente),
+            'Perfil actualizado com sucesso.'
+        );
+    }
+
+
+    public function approve(Docente $docente)
+    {
+        $this->authorize('update', $docente);
+
+        $docente->user->update([
+            'status' => 'approved'
         ]);
 
-        return new DocenteResource($docente);
+        $docente->load('user');
+
+        return $this->success(
+            new DocenteResource($docente),
+            'Docente aprovado com sucesso.'
+        );
+    }
+
+    public function reject(Docente $docente)
+    {
+        $this->authorize('update', $docente);
+
+        $docente->user->update([
+            'status' => 'rejected'
+        ]);
+
+        $docente->load('user');
+
+        return $this->success(
+            new DocenteResource($docente),
+            'Docente rejeitado com sucesso.'
+        );
+    }
+    public function pending()
+    {
+        $this->authorize('viewAny', Docente::class);
+
+        $docentes = Docente::with('user')
+            ->whereHas('user', function ($query) {
+                $query->where('status', 'pending');
+            })
+            ->get();
+
+        return $this->success(
+            DocenteResource::collection($docentes),
+            'Docentes pendentes listados com sucesso.'
+        );
     }
 }

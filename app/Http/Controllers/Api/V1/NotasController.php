@@ -10,6 +10,9 @@ use App\Http\Resources\NotaResource;
 
 use App\Models\Nota;
 use App\Services\NotasService;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class NotasController extends BaseController
 {
@@ -17,98 +20,81 @@ class NotasController extends BaseController
         protected NotasService $notaService
     ) {}
 
-    /*
-    |--------------------------------------------------------------------------
-    | LISTAGEM
-    |--------------------------------------------------------------------------
-    */
+
     public function index(IndexNotaRequest $request)
     {
         $this->authorize('viewAny', Nota::class);
 
-        $notas = $this->notaService->listarFiltrado(
-            $request->validated()
-        );
+        $notas = $this->notaService->listarFiltrado($request->validated());
 
-        return NotaResource::collection($notas);
+        return $this->success(
+            NotaResource::collection($notas),
+            'Notas listadas com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETALHE
-    |--------------------------------------------------------------------------
-    */
     public function show(Nota $nota)
     {
         $this->authorize('view', $nota);
 
-        $nota->load([
-            'aluno',
-            'disciplina',
-            'turma',
-        ]);
+        $nota->load(['aluno', 'disciplina', 'turma']);
 
-        return new NotaResource($nota);
+        return $this->success(
+            new NotaResource($nota),
+            'Nota encontrada com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CRIAÇÃO
-    |--------------------------------------------------------------------------
-    */
+
     public function store(StoreNotaRequest $request)
     {
+
         $this->authorize('create', Nota::class);
 
-        $nota = $this->notaService->criar(
-            $request->validated()
+        $nota = $this->notaService->criar($request->validated());
+
+        $nota->load(['aluno', 'disciplina', 'turma']);
+
+        return $this->success(
+            new NotaResource($nota),
+            'Nota criada com sucesso.',
+            201
         );
+    }
+    public function minhasNotas()
+    {
+        $user = Auth::user();
 
-        $nota->load([
-            'aluno',
-            'disciplina',
-            'turma',
-        ]);
+        if (!$user->aluno) {
+            return $this->error('Aluno não encontrado para este utilizador', 404);
+        }
 
-        return new NotaResource($nota);
+        $notas = Nota::with(['disciplina', 'turma'])
+            ->where('aluno_id', $user->aluno->id)
+            ->get();
+
+        return $this->success($notas, 'Notas carregadas com sucesso.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
+
     public function update(UpdateNotaRequest $request, Nota $nota)
     {
         $this->authorize('update', $nota);
 
-        $nota = $this->notaService->atualizar(
-            $nota->id,
-            $request->validated()
+        $nota = $this->notaService->atualizar($nota->id, $request->validated());
+
+        return $this->success(
+            new NotaResource($nota),
+            'Nota actualizada com sucesso.'
         );
-
-        $nota->load([
-            'aluno',
-            'disciplina',
-            'turma',
-        ]);
-
-        return new NotaResource($nota);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | REMOÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function destroy(Nota $nota)
     {
         $this->authorize('delete', $nota);
 
         $this->notaService->deletar($nota->id);
 
-        return $this->success(
-            'Nota eliminada com sucesso.'
-        );
+        return $this->success(null, 'Nota eliminada com sucesso.');
     }
 }

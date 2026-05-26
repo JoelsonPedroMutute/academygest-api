@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\StoreDisciplinaRequest;
 use App\Http\Requests\UpdateDisciplinaRequest;
 use App\Http\Requests\IndexDisciplinaRequest;
+use App\Services\DisciplinasService;
 
 use App\Http\Resources\DisciplinaResource;
 
 use App\Models\Disciplina;
-use App\Service\DisciplinasService;
+
 
 class DisciplinasController extends BaseController
 {
@@ -44,7 +45,7 @@ class DisciplinasController extends BaseController
 
         $disciplina->load([
             'curso',
-            'professores',
+            'docentes',
         ]);
 
         return new DisciplinaResource($disciplina);
@@ -65,7 +66,7 @@ class DisciplinasController extends BaseController
 
         $disciplina->load([
             'curso',
-            'professores',
+            'docentes',
         ]);
 
         return new DisciplinaResource($disciplina);
@@ -87,7 +88,7 @@ class DisciplinasController extends BaseController
 
         $disciplina->load([
             'curso',
-            'professores',
+            'docentes',
         ]);
 
         return new DisciplinaResource($disciplina);

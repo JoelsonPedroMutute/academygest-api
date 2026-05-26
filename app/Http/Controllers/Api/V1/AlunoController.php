@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreAlunoRequest;
 use App\Http\Requests\UpdateAlunoRequest;
 use App\Http\Requests\IndexAlunoRequest;
 use App\Http\Resources\AlunoResource;
 use App\Models\Aluno;
+
 use App\Services\AlunoService;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,183 +18,115 @@ class AlunoController extends BaseController
         protected AlunoService $alunoService
     ) {}
 
-    /*
-    |--------------------------------------------------------------------------
-    | LISTAGEM
-    |--------------------------------------------------------------------------
-    */
+
     public function index(IndexAlunoRequest $request)
     {
         $this->authorize('viewAny', Aluno::class);
 
-        $alunos = $this->alunoService->listarFiltrado(
-            $request->validated()
-        );
+        $alunos = $this->alunoService->listarFiltrado($request->validated());
 
-        return AlunoResource::collection($alunos);
+        return $this->success(
+            AlunoResource::collection($alunos),
+            'Alunos listados com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETALHE
-    |--------------------------------------------------------------------------
-    */
     public function show(Aluno $aluno)
     {
         $this->authorize('view', $aluno);
 
-        $aluno->load([
-            'turma',
-            'encarregado',
-            'notas',
-        ]);
+        $aluno->load(['turma', 'notas']);
 
-        return new AlunoResource($aluno);
+        return $this->success(
+            new AlunoResource($aluno),
+            'Aluno encontrado com sucesso.'
+        );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CRIAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function store(StoreAlunoRequest $request)
     {
         $this->authorize('create', Aluno::class);
 
-        $aluno = $this->alunoService->criar(
-            $request->validated()
+        $aluno = $this->alunoService->criar($request->validated(), 'admin');
+
+        $aluno->load(['turma']);
+
+        return $this->success(
+            new AlunoResource($aluno),
+            'Aluno criado com sucesso.',
+            201
         );
-
-        $aluno->load([
-            'turma',
-            'encarregado',
-        ]);
-
-        return new AlunoResource($aluno);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function update(UpdateAlunoRequest $request, Aluno $aluno)
     {
         $this->authorize('update', $aluno);
 
-        $aluno = $this->alunoService->atualizar(
-            $aluno->id,
-            $request->validated()
+        $aluno = $this->alunoService->atualizar($aluno->id, $request->validated());
+
+        $aluno->load(['turma']);
+
+        return $this->success(
+            new AlunoResource($aluno),
+            'Aluno actualizado com sucesso.'
         );
-
-        $aluno->load([
-            'turma',
-            'encarregado',
-        ]);
-
-        return new AlunoResource($aluno);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ELIMINAÇÃO
-    |--------------------------------------------------------------------------
-    */
     public function destroy(Aluno $aluno)
     {
         $this->authorize('delete', $aluno);
 
         $this->alunoService->deletar($aluno->id);
 
-        return $this->success(
-            'Aluno eliminado com sucesso.'
-        );
+        return $this->success(null, 'Aluno eliminado com sucesso.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ESTADO
-    |--------------------------------------------------------------------------
-    */
-    public function activar(Aluno $aluno)
-    {
-        $this->authorize('update', $aluno);
-
-        $this->alunoService->activar($aluno->id);
-
-        return $this->success(
-            'Aluno activado com sucesso.'
-        );
-    }
-
-    public function desactivar(Aluno $aluno)
-    {
-        $this->authorize('update', $aluno);
-
-        $this->alunoService->desactivar($aluno->id);
-
-        return $this->success(
-            'Aluno desactivado com sucesso.'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | PERFIL DO UTILIZADOR AUTENTICADO
-    |--------------------------------------------------------------------------
-    */
     public function meuPerfil()
     {
-        $aluno = $this->alunoService->buscarPorUser(
-            Auth::id()
-        );
+        $aluno = $this->alunoService->buscarPorUser(Auth::id());
 
         abort_if(!$aluno, 404);
 
-        $aluno->load([
-            'turma',
-            'encarregado',
-            'notas',
-        ]);
+        $aluno->load(['turma', 'notas']);
 
-        return new AlunoResource($aluno);
+        return $this->success(
+            new AlunoResource($aluno),
+            'Perfil carregado com sucesso.'
+        );
     }
 
-    public function actualizarMeuPerfil(UpdateAlunoRequest $request)
+    public function atualizarMeuPerfil(Request $request)
     {
-        $aluno = $this->alunoService->buscarPorUser(
-            Auth::id()
-        );
+        $aluno = $request->user()->aluno;
 
-        abort_if(!$aluno, 404);
-
-        $this->authorize('update', $aluno);
+        $data = $request->validate([
+            'name' => 'sometimes|string',
+            'email' => 'sometimes|email',
+            'data_nascimento' => 'sometimes|date',
+            'numero_estudante' => 'sometimes|string',
+            'turma_id' => 'sometimes|integer',
+        ]);
 
         $aluno = $this->alunoService->atualizar(
             $aluno->id,
-            $request->validated()
+            $data
         );
 
-        $aluno->load([
-            'turma',
-            'encarregado',
+        return response()->json([
+            'message' => 'Perfil atualizado com sucesso.',
+            'data' => $aluno
         ]);
-
-        return new AlunoResource($aluno);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LIXEIRA
-    |--------------------------------------------------------------------------
-    */
     public function trashed()
     {
         $this->authorize('viewAny', Aluno::class);
 
         $alunos = $this->alunoService->listarEliminados();
 
-        return AlunoResource::collection($alunos);
+        return $this->success(
+            AlunoResource::collection($alunos),
+            'Alunos eliminados listados com sucesso.'
+        );
     }
 
     public function restore(Aluno $aluno)
@@ -201,8 +135,6 @@ class AlunoController extends BaseController
 
         $this->alunoService->restaurar($aluno->id);
 
-        return $this->success(
-            'Aluno restaurado com sucesso.'
-        );
+        return $this->success(null, 'Aluno restaurado com sucesso.');
     }
 }

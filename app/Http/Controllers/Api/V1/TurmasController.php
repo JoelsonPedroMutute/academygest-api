@@ -42,13 +42,9 @@ class TurmasController extends BaseController
     {
         $this->authorize('view', $turma);
 
-        $turma->load([
-            'curso',
-            'alunos',
-            'disciplinas',
-        ]);
-
-        return new TurmaResource($turma);
+        return new TurmaResource(
+            $turma->load(['curso', 'alunos', 'disciplinas'])
+        );
     }
 
     /*
