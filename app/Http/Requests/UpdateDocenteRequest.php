@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateDocenteRequest extends FormRequest
 {
@@ -13,6 +14,13 @@ class UpdateDocenteRequest extends FormRequest
     public function authorize(): bool
     {
         $docente = $this->route('docente');
+
+        // Sem parâmetro = é o próprio docente atualizando o perfil
+        if (!$docente) {
+            return Auth::check() && Auth::user()->role === 'docente';
+        }
+
+        // Com parâmetro = admin atualizando docente específico
         return $this->user()->can('update', $docente);
     }
 
@@ -23,22 +31,31 @@ class UpdateDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255|unique:docentes,name,' . $this->route('docente')->id,
-            'email' => 'required|email|unique:docentes,email,' . $this->route('docente')->id,
-            'telefone' => 'nullable|string|max:20',
-            'especialidade' => 'nullable|string|max:255',
-
+        $rules = [
+            'name'           => 'sometimes|string|max:255',
+            'email'          => 'sometimes|email',
+            'telefone'       => 'sometimes|nullable|string|max:20',
+            'especialidade'  => 'sometimes|nullable|string|max:255',
+            'data_nascimento' => 'sometimes|nullable|date',
         ];
+
+        // Adicionar regras de unique apenas quando houver um docente específico
+        $docente = $this->route('docente');
+        if ($docente && $docente->user_id) {
+            $userId = $docente->user_id;
+            $rules['name'] .= '|unique:users,name,' . $userId;
+            $rules['email'] .= '|unique:users,email,' . $userId;
+        }
+
+        return $rules;
     }
+
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome do docente é obrigatório.',
             'name.string' => 'O nome do docente deve ser uma string.',
             'name.max' => 'O nome do docente deve ter no máximo 255 caracteres.',
             'name.unique' => 'Este nome de docente já está em uso.',
-            'email.required' => 'O email do docente é obrigatório.',
             'email.email' => 'O email do docente deve ser um endereço de email válido.',
             'email.unique' => 'Este email de docente já está em uso.',
             'telefone.string' => 'O telefone do docente deve ser uma string.',

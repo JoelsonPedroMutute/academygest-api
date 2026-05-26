@@ -25,18 +25,19 @@ class StoreDisciplinaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:disciplinas',
+            'nome' => 'required|string|max:255|unique:disciplinas',
             'descricao' => 'nullable|string',
+            'curso_id' => 'required|integer|exists:cursos,id',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome da disciplina é obrigatório.',
-            'name.string' => 'O nome da disciplina deve ser uma string.',
-            'name.max' => 'O nome da disciplina deve ter no máximo 255 caracteres.',
-            'name.unique' => 'Este nome de disciplina já está em uso.',
+            'nome.required' => 'O nome da disciplina é obrigatório.',
+            'nome.string' => 'O nome da disciplina deve ser uma string.',
+            'nome.max' => 'O nome da disciplina deve ter no máximo 255 caracteres.',
+            'nome.unique' => 'Este nome de disciplina já está em uso.',
             'descricao.string' => 'A descrição da disciplina deve ser uma string.',
         ];
     }

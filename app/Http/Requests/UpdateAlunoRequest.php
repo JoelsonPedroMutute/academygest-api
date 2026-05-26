@@ -26,12 +26,12 @@ class UpdateAlunoRequest extends FormRequest
         $aluno = $this->route('aluno');
 
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $aluno->user->id,
-            'password' => 'nullable|string|min:6|confirmed',
-            'turma_id' => 'required|integer|exists:turmas,id',
-            'data_nascimento' => 'required|date|before:today',
-            'numero_estudante' => 'required|string|max:20|unique:alunos,numero_estudante,' . $aluno->id,
+            'name'            => 'sometimes|string|max:255',
+            'email'           => 'sometimes|email|max:255|unique:users,email,' . $aluno->user->id,
+            'password'        => 'sometimes|nullable|string|min:6|confirmed',
+            'turma_id'        => 'sometimes|integer|exists:turmas,id',
+            'data_nascimento' => 'sometimes|date|before:today',
+            'numero_estudante' => 'sometimes|string|max:20|unique:alunos,numero_estudante,' . $aluno->id,
         ];
     }
     public function messages(): array

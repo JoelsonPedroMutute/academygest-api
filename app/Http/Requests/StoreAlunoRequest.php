@@ -14,7 +14,15 @@ class StoreAlunoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Aluno::class);
+        // Rota pública: qualquer um pode registar
+        // Rota admin: verifica permissão
+        $user = $this->user();
+
+        if (!$user) {
+            return true;
+        }
+
+        return $user->can('create', Aluno::class);
     }
 
     /**
@@ -25,15 +33,14 @@ class StoreAlunoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-            'turma_id' => 'required|integer|exists:turmas,id',
+            'name'            => 'required|string|max:255',
+            'email'           => 'required|string|email|max:255|unique:users',
+            'password'        => 'required|string|min:6|confirmed',
+            'turma_id'        => 'required|integer|exists:turmas,id',
             'data_nascimento' => 'required|date|before:today',
-            'numero_estudante' => 'required|string|max:20|unique:alunos',
+            // numero_estudante removido — gerado automaticamente
         ];
     }
-
     public function messages(): array
     {
         return [

@@ -13,7 +13,7 @@ class StoreDocenteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Docente::class);
+        return true;
         // return false; --- IGNORE ---
     }
 
@@ -24,15 +24,16 @@ class StoreDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('docente')->user_id;
+
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'data_nascimento' => 'required|date|before:today',
-            'especialidade' => 'required|string|max:255',
+            'name'          => 'sometimes|string|max:255|unique:users,name,' . $userId,
+            'email'         => 'sometimes|email|unique:users,email,' . $userId,
+            'telefone'      => 'sometimes|nullable|string|max:20',
+            'especialidade' => 'sometimes|nullable|string|max:255',
+            'data_nascimento' => 'sometimes|date',
         ];
     }
-
     public function messages(): array
     {
         return [

@@ -8,14 +8,11 @@ use App\Models\Nota;
 
 class StoreNotaRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Nota::class);
-        // return false; --- IGNORE ---
+        return true;
     }
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -25,28 +22,27 @@ class StoreNotaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'aluno_id' => 'required|integer|exists:alunos,id',
-            'disciplina_id' => 'required|integer|exists:disciplinas,id',
-            'nota' => 'required|numeric|min:0|max:20',
-            'data' => 'required|date',
+            'aluno_id'         => 'required|integer|exists:alunos,id',
+            'disciplina_id'    => 'required|integer|exists:disciplinas,id',
+            'turma_id'         => 'required|integer|exists:turmas,id',
+            'prova_trimestral' => 'nullable|numeric|min:0|max:20',
+            'prova_semestral'  => 'nullable|numeric|min:0|max:20',
+            'exame_final'      => 'nullable|numeric|min:0|max:20',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'aluno_id.required' => 'O aluno é obrigatório.',
-            'aluno_id.integer' => 'O aluno deve ser um número inteiro.',
-            'aluno_id.exists' => 'O aluno selecionado não existe.',
+            'aluno_id.required'      => 'O aluno é obrigatório.',
+            'aluno_id.exists'        => 'O aluno seleccionado não existe.',
             'disciplina_id.required' => 'A disciplina é obrigatória.',
-            'disciplina_id.integer' => 'A disciplina deve ser um número inteiro.',
-            'disciplina_id.exists' => 'A disciplina selecionada não existe.',
-            'nota.required' => 'A nota é obrigatória.',
-            'nota.numeric' => 'A nota deve ser um número.',
-            'nota.min' => 'A nota deve ser um valor entre 0 e 10.',
-            'nota.max' => 'A nota deve ser um valor entre 0 e 10.',
-            'data.required' => 'A data é obrigatória.',
-            'data.date' => 'A data deve ser uma data válida.',
+            'disciplina_id.exists'   => 'A disciplina seleccionada não existe.',
+            'turma_id.required'      => 'A turma é obrigatória.',
+            'turma_id.exists'        => 'A turma seleccionada não existe.',
+            '*.numeric'              => 'A nota deve ser um número.',
+            '*.min'                  => 'A nota mínima é 0.',
+            '*.max'                  => 'A nota máxima é 20.',
         ];
     }
 }

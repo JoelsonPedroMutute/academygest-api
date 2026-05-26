@@ -25,25 +25,31 @@ class StoreTurmaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:255',
-            'ano' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'semestre' => 'required|integer|min:1|max:2',
+            'nome'       => 'required|string|max:255',
+            'curso_id'   => 'required|integer|exists:cursos,id',
+            'ano_letivo' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'semestre'   => 'required|integer|min:1|max:2',
+            'capacidade' => 'nullable|integer|min:1',
+            'turno'      => 'nullable|string|in:manha,tarde,noite',
         ];
     }
+
     public function messages(): array
     {
         return [
-            'nome.required' => 'O nome da turma é obrigatório.',
-            'nome.string' => 'O nome da turma deve ser uma string.',
-            'nome.max' => 'O nome da turma não pode exceder 255 caracteres.',
-            'ano.required' => 'O ano da turma é obrigatório.',
-            'ano.integer' => 'O ano da turma deve ser um número inteiro.',
-            'ano.min' => 'O ano da turma não pode ser anterior a 1900.',
-            'ano.max' => 'O ano da turma não pode ser posterior a ' . (date('Y') + 1) . '.',
-            'semestre.required' => 'O semestre da turma é obrigatório.',
-            'semestre.integer' => 'O semestre da turma deve ser um número inteiro.',
-            'semestre.min' => 'O semestre da turma deve ser no mínimo 1.',
-            'semestre.max' => 'O semestre da turma deve ser no máximo 2.',
+            'nome.required'       => 'O nome da turma é obrigatório.',
+            'nome.string'         => 'O nome da turma deve ser uma string.',
+            'nome.max'            => 'O nome da turma não pode exceder 255 caracteres.',
+            'curso_id.required'   => 'O curso é obrigatório.',
+            'curso_id.exists'     => 'O curso seleccionado não existe.',
+            'ano_letivo.required' => 'O ano lectivo é obrigatório.',
+            'ano_letivo.integer'  => 'O ano lectivo deve ser um número inteiro.',
+            'ano_letivo.min'      => 'O ano lectivo não pode ser anterior a 1900.',
+            'ano_letivo.max'      => 'O ano lectivo não pode ser posterior a ' . (date('Y') + 1) . '.',
+            'semestre.required'   => 'O semestre é obrigatório.',
+            'semestre.min'        => 'O semestre deve ser no mínimo 1.',
+            'semestre.max'        => 'O semestre deve ser no máximo 2.',
+            'turno.in'            => 'O turno deve ser: manha, tarde ou noite.',
         ];
     }
 }

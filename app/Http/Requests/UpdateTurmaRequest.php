@@ -24,19 +24,25 @@ class UpdateTurmaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:turmas,name,' . $this->route('turma')->id,
-            'descricao' => 'nullable|string',
-
+            'nome'       => 'sometimes|string|max:255',
+            'curso_id'   => 'sometimes|integer|exists:cursos,id',
+            'ano_letivo' => 'sometimes|integer|min:1900|max:' . (date('Y') + 1),
+            'semestre'   => 'sometimes|integer|min:1|max:2',
+            'capacidade' => 'nullable|integer|min:1',
+            'turno'      => 'nullable|string|in:manhã,tarde,noite',
         ];
     }
+
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome da turma é obrigatório.',
-            'name.string' => 'O nome da turma deve ser uma string.',
-            'name.max' => 'O nome da turma deve ter no máximo 255 caracteres.',
-            'name.unique' => 'Este nome de turma já está em uso.',
-            'descricao.string' => 'A descrição da turma deve ser uma string.',
+            'nome.string'         => 'O nome da turma deve ser uma string.',
+            'nome.max'            => 'O nome da turma não pode exceder 255 caracteres.',
+            'curso_id.exists'     => 'O curso seleccionado não existe.',
+            'ano_letivo.integer'  => 'O ano lectivo deve ser um número inteiro.',
+            'semestre.min'        => 'O semestre deve ser no mínimo 1.',
+            'semestre.max'        => 'O semestre deve ser no máximo 2.',
+            'turno.in'            => 'O turno deve ser: manhã, tarde ou noite.',
         ];
     }
 }
