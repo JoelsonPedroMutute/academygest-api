@@ -4,40 +4,52 @@ namespace App\Policies;
 
 use App\Models\Docente;
 use App\Models\User;
-use App\Policies\BasePolicy;
 
 class DocentePolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $this->isAdmin($user);  // Só admin vê lista de docentes
+        return $user->role === 'admin';
     }
 
     public function view(User $user, Docente $docente): bool
     {
-        if ($this->isDocente($user)) {
-            return $user->docente->id === $docente->id;
+        if ($user->role === 'admin') {
+            return true;
         }
 
-        return $this->isAdmin($user);
+        if ($user->role === 'docente') {
+            return $user->id === $docente->user_id;
+        }
+
+        return false;
     }
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user);
+        return $user->role === 'admin';
     }
 
-    public function update(User $user, Docente $docente): bool
+    public function update(User $user, ?Docente $docente = null): bool  // Mude aqui: permitir null
     {
-        if ($this->isDocente($user)) {
-            return $user->docente->id === $docente->id;
+        // Se for o perfil do próprio docente (sem modelo específico)
+        if ($docente === null) {
+            return $user->role === 'docente' || $user->role === 'admin';
         }
 
-        return $this->isAdmin($user);
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        if ($user->role === 'docente') {
+            return $user->id === $docente->user_id;
+        }
+
+        return false;
     }
 
     public function delete(User $user, Docente $docente): bool
     {
-        return $this->isAdmin($user);
+        return $user->role === 'admin';
     }
 }

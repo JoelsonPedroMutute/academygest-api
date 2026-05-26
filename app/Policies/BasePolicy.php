@@ -6,14 +6,17 @@ use App\Models\User;
 
 class BasePolicy
 {
-    // Método before para todos os policies
     public function before(User $user, string $ability): bool|null
     {
         if ($user->role === 'admin') {
-            return true;  // Admin faz tudo
+            return true;
         }
 
-        return null;  // Outros usuários vão para regras específicas
+        if ($user->status !== 'active' && $user->status !== 'approved') {
+            return false;
+        }
+
+        return null; // deixa continuar para a policy específica
     }
 
     protected function isAdmin(User $user): bool

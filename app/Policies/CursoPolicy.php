@@ -17,18 +17,20 @@ class CursoPolicy extends BasePolicy
 
     public function view(User $user, Curso $curso): bool
     {
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
         if ($this->isDocente($user)) {
-            return $user->docente->disciplinas()
-                ->whereHas('turmaDisciplina', function ($query) use ($curso) {
-                    $query->whereHas('turma', function ($q) use ($curso) {
-                        $q->where('curso_id', $curso->id);
-                    });
-                })
+            return $user->docente
+                ->turmas()
+                ->where('curso_id', $curso->id)
                 ->exists();
         }
 
         if ($this->isAluno($user)) {
-            return $user->aluno->matriculas()
+            return $user->aluno
+                ->turma()
                 ->where('curso_id', $curso->id)
                 ->exists();
         }

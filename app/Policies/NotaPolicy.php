@@ -28,7 +28,18 @@ class NotaPolicy extends BasePolicy
 
     public function create(User $user): bool
     {
-        return $this->isDocente($user);
+        return $this->isDocente($user) && in_array($user->status, ['active', 'approved']);
+
+        \Log::info('=== NotaPolicy::create ===', [
+            'user_id' => $user->id,
+            'role' => $user->role,
+            'status' => $user->status,
+            'isDocente' => $isDocente,
+            'statusValid' => $statusValid,
+            'result' => $isDocente && $statusValid
+        ]);
+
+        return $isDocente && $statusValid;
     }
 
     public function update(User $user, Nota $nota): bool

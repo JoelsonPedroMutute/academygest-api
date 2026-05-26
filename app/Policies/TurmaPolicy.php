@@ -18,9 +18,7 @@ class TurmaPolicy extends BasePolicy
         if ($this->isDocente($user)) return true;
 
         if ($this->isAluno($user)) {
-            return $user->aluno->turmas()
-                ->where('turma_id', $turma->id)
-                ->exists();
+            return $user->aluno?->turma_id === $turma->id;
         }
 
         return false;
