@@ -11,17 +11,15 @@ use App\Models\Docente;
 use App\Models\Matricula;
 use App\Models\Nota;
 use App\Models\Turma;
-
-
+use App\Models\User;
 use App\Policies\CursoPolicy;
 use App\Policies\DocentePolicy;
-use App\Policies\FrequenciaPolicy;
 use App\Policies\AlunoPolicy;
 use App\Policies\NotaPolicy;
 use App\Policies\DisciplinaPolicy;
 use App\Policies\MatriculaPolicy;
 use App\Policies\TurmaPolicy;
-
+use App\Policies\UserPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Disciplina::class, DisciplinaPolicy::class);
         Gate::policy(Matricula::class, MatriculaPolicy::class);
         Gate::policy(Nota::class, NotaPolicy::class);
-
+        Gate::policy(User::class, UserPolicy::class);
     }
 }
