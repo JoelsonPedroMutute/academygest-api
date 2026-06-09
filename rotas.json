@@ -1,0 +1,675 @@
+{
+  "rotas": {
+    "publicas": [
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/login",
+        "controlador": "AuthController",
+        "acao": "login",
+        "middleware": [],
+        "body": {
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório)"
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/forgot-password",
+        "controlador": "AuthController",
+        "acao": "forgotPassword",
+        "middleware": [],
+        "body": {
+          "email": "string (obrigatório)"
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/reset-password",
+        "controlador": "AuthController",
+        "acao": "resetPassword",
+        "middleware": [],
+        "body": {
+          "token": "string (obrigatório)",
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)"
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/change-password",
+        "controlador": "AuthController",
+        "acao": "resetPassword",
+        "middleware": [],
+        "body": {
+          "token": "string (obrigatório)",
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)"
+        }
+      },
+      {
+        "metodo": "GET",
+        "caminho": "/api/auth/change-password",
+        "controlador": null,
+        "acao": "closure",
+        "middleware": [],
+        "body": null
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/register/aluno",
+        "controlador": "AuthController",
+        "acao": "registerAluno",
+        "middleware": [],
+        "body": {
+          "name": "string (obrigatório, max:255)",
+          "email": "string (obrigatório, email, max:255, único)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)",
+          "turma_id": "integer (obrigatório, existe em turmas)",
+          "data_nascimento": "date (obrigatório, anterior a hoje)"
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/register/docente",
+        "controlador": "AuthController",
+        "acao": "registerDocente",
+        "middleware": [],
+        "body": {
+          "name": "string (opcional, max:255, único)",
+          "email": "string (opcional, email, único)",
+          "telefone": "string (opcional, nullable, max:20)",
+          "especialidade": "string (opcional, nullable, max:255)",
+          "data_nascimento": "date (opcional)"
+        }
+      }
+    ],
+    "protegidas": {
+      "autenticadas": [
+        {
+          "metodo": "POST",
+          "caminho": "/api/auth/logout",
+          "controlador": "AuthController",
+          "acao": "logout",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/auth/perfil",
+          "controlador": "AuthController",
+          "acao": "perfil",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/ping",
+          "controlador": null,
+          "acao": "closure",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null
+        }
+      ],
+      "admin": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "admin",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/docentes/pending",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "pending",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/docentes/{docente}/approve",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "approve",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/docentes/{docente}/reject",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "reject",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/alunos",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/alunos",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255)",
+            "email": "string (obrigatório, email, max:255, único)",
+            "password": "string (obrigatório, min:6, confirmed)",
+            "password_confirmation": "string (obrigatório)",
+            "turma_id": "integer (obrigatório, existe em turmas)",
+            "data_nascimento": "date (obrigatório, anterior a hoje)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/alunos/{aluno}",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/alunos/{aluno}",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "email": "string (opcional, email, max:255, único)",
+            "password": "string (opcional, nullable, min:6, confirmed)",
+            "password_confirmation": "string (opcional)",
+            "turma_id": "integer (opcional, existe em turmas)",
+            "data_nascimento": "date (opcional, anterior a hoje)",
+            "numero_estudante": "string (opcional, max:20, único)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/alunos/{aluno}",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/docentes",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/docentes",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255, único)",
+            "email": "string (opcional, email, único)",
+            "telefone": "string (opcional, nullable, max:20)",
+            "especialidade": "string (opcional, nullable, max:255)",
+            "data_nascimento": "date (opcional)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/docentes/{docente}",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/docentes/{docente}",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "email": "string (opcional, email)",
+            "telefone": "string (opcional, nullable, max:20)",
+            "especialidade": "string (opcional, nullable, max:255)",
+            "data_nascimento": "date (opcional, nullable)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/docentes/{docente}",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/cursos",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/cursos",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (obrigatório, max:255, único)",
+            "duracao": "integer (opcional, nullable, min:1, max:10)",
+            "descricao": "string (opcional, nullable)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/cursos/{curso}",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/cursos/{curso}",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (obrigatório, max:255, único)",
+            "duracao": "integer (opcional, nullable, min:1, max:10)",
+            "descricao": "string (opcional, nullable)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/cursos/{curso}",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/turmas",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/turmas",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (obrigatório, max:255)",
+            "curso_id": "integer (obrigatório, existe em cursos)",
+            "ano_letivo": "string (obrigatório, max:20)",
+            "semestre": "integer (obrigatório, min:1, max:2)",
+            "capacidade": "integer (opcional, nullable, min:1)",
+            "turno": "string (opcional, nullable, em: manha, manhã, tarde, noite, Manha, Tarde)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/turmas/{turma}",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/turmas/{turma}",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (opcional, max:255)",
+            "curso_id": "integer (opcional, existe em cursos)",
+            "ano_letivo": "string (opcional, max:20)",
+            "semestre": "integer (opcional, min:1, max:2)",
+            "capacidade": "integer (opcional, nullable, min:1)",
+            "turno": "string (opcional, nullable, em: manha, manhã, tarde, noite, Manha, Tarde)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/turmas/{turma}",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/disciplinas",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/disciplinas",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (obrigatório, max:255, único)",
+            "descricao": "string (opcional, nullable)",
+            "curso_id": "integer (obrigatório, existe em cursos)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/disciplinas/{disciplina}",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/disciplinas/{disciplina}",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "nome": "string (obrigatório, max:255, único)",
+            "descricao": "string (opcional, nullable)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/disciplinas/{disciplina}",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/notas",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/notas",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "aluno_id": "integer (obrigatório, existe em alunos)",
+            "disciplina_id": "integer (obrigatório, existe em disciplinas)",
+            "turma_id": "integer (obrigatório, existe em turmas)",
+            "prova_trimestral": "numeric (opcional, nullable, min:0, max:20)",
+            "prova_semestral": "numeric (opcional, nullable, min:0, max:20)",
+            "exame_final": "numeric (opcional, nullable, min:0, max:20)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/notas/{nota}",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/notas/{nota}",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "aluno_id": "integer (opcional, existe em alunos)",
+            "disciplina_id": "integer (opcional, existe em disciplinas)",
+            "turma_id": "integer (opcional, existe em turmas)",
+            "prova_trimestral": "numeric (opcional, nullable, min:0, max:20)",
+            "prova_semestral": "numeric (opcional, nullable, min:0, max:20)",
+            "exame_final": "numeric (opcional, nullable, min:0, max:20)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/notas/{nota}",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/matriculas",
+          "controlador": "Api\\V1\\MatriculasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/matriculas",
+          "controlador": "Api\\V1\\MatriculasController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "aluno_id": "integer (obrigatório, existe em alunos)",
+            "turma_id": "integer (obrigatório, existe em turmas)",
+            "ano_letivo": "string (opcional, nullable, max:10)",
+            "semestre": "string (opcional, nullable, max:10)",
+            "data_matricula": "date (opcional, nullable)",
+            "status": "string (opcional, em: ativa, suspensa, cancelada, concluida)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/matriculas/{matricula}",
+          "controlador": "Api\\V1\\MatriculasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/matriculas/{matricula}",
+          "controlador": "Api\\V1\\MatriculasController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "aluno_id": "integer (opcional, existe em alunos)",
+            "turma_id": "integer (opcional, existe em turmas)",
+            "ano_letivo": "string (opcional, nullable, max:10)",
+            "semestre": "string (opcional, nullable, max:10)",
+            "data_matricula": "date (opcional, nullable)",
+            "status": "string (opcional, em: ativa, suspensa, cancelada, concluida)"
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/matriculas/{matricula}",
+          "controlador": "Api\\V1\\MatriculasController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null
+        }
+      ],
+      "docente": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "docente",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/notas",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/docente/notas",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": {
+            "aluno_id": "integer (obrigatório, existe em alunos)",
+            "disciplina_id": "integer (obrigatório, existe em disciplinas)",
+            "turma_id": "integer (obrigatório, existe em turmas)",
+            "prova_trimestral": "numeric (opcional, nullable, min:0, max:20)",
+            "prova_semestral": "numeric (opcional, nullable, min:0, max:20)",
+            "exame_final": "numeric (opcional, nullable, min:0, max:20)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/notas/{nota}",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/turmas",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/turmas/{turma}",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/cursos",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/disciplinas",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/docente/perfil",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "meuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": null
+        },
+        {
+          "metodo": "PATCH",
+          "caminho": "/api/docente/perfil",
+          "controlador": "Api\\V1\\DocentesController",
+          "acao": "actualizarMeuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:docente"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "email": "string (opcional, email)",
+            "telefone": "string (opcional, nullable, max:20)",
+            "especialidade": "string (opcional, nullable, max:255)",
+            "data_nascimento": "date (opcional, nullable)"
+          }
+        }
+      ],
+      "aluno": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "aluno",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/perfil",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "meuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        },
+        {
+          "metodo": "PATCH",
+          "caminho": "/api/aluno/perfil",
+          "controlador": "Api\\V1\\AlunoController",
+          "acao": "atualizarMeuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": {
+            "name": "string (opcional)",
+            "email": "string (opcional, email)",
+            "data_nascimento": "date (opcional)",
+            "numero_estudante": "string (opcional)",
+            "turma_id": "integer (opcional)"
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/notas",
+          "controlador": "Api\\V1\\NotasController",
+          "acao": "minhasNotas",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/turmas/{turma}",
+          "controlador": "Api\\V1\\TurmasController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/cursos",
+          "controlador": "Api\\V1\\CursosController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/aluno/disciplinas",
+          "controlador": "Api\\V1\\DisciplinasController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:aluno"],
+          "body": null
+        }
+      ]
+    }
+  }
+}

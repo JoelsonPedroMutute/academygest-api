@@ -12,53 +12,50 @@ class UserService extends BaseService
         $this->model = User::class;
     }
 
-
-    public function criar(array $dados): User
+    public function create(array $data): User
     {
         return User::create([
-            'name'     => $dados['name'],
-            'email'    => $dados['email'],
-            'password' => Hash::make($dados['password']),
-            'role'     => $dados['role'],
-            'telefone' => $dados['telefone'] ?? null,
-            'status'   => $dados['status'] ?? 'active',
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role'     => $data['role'],
+            'phone'    => $data['phone'] ?? null,
+            'status'   => $data['status'] ?? 'active',
         ]);
     }
 
-
-    public function atualizar(int|User $id, array $dados): User
+    public function update(int|User $id, array $data): User
     {
-        $user = $id instanceof User ? $id : $this->buscarPorId($id);
+        $user = $id instanceof User
+            ? $id
+            : $this->findById($id);
 
         $user->update([
-            'name'  => $dados['name']  ?? $user->name,
-            'email' => $dados['email'] ?? $user->email,
+            'name'  => $data['name'] ?? $user->name,
+            'email' => $data['email'] ?? $user->email,
+            'phone' => $data['phone'] ?? $user->phone,
         ]);
 
-        if (!empty($dados['password'])) {
-            $user->update(['password' => Hash::make($dados['password'])]);
+        if (!empty($data['password'])) {
+            $user->update([
+                'password' => Hash::make($data['password']),
+            ]);
         }
 
         return $user->fresh();
     }
 
-
-
-    public function activar(User $user): bool
+    public function activate(User $user): bool
     {
-        return $user->update([
-            'status' => 'active'
-        ]);
+        return $user->update(['status' => 'active']);
     }
 
-    public function desactivar(User $user): bool
+    public function deactivate(User $user): bool
     {
-        return $user->update([
-            'status' => 'inactive'
-        ]);
+        return $user->update(['status' => 'inactive']);
     }
 
-    public function listarFiltrado(array $filters)
+    public function listFiltered(array $filters)
     {
         return User::query()
             ->filtered($filters)

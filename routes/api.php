@@ -1,45 +1,55 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AlunoController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\V1\CursosController;
-use App\Http\Controllers\Api\V1\DisciplinasController;
-use App\Http\Controllers\Api\V1\DocentesController;
-use App\Http\Controllers\Api\V1\MatriculasController;
-use App\Http\Controllers\Api\V1\NotasController;
-use App\Http\Controllers\Api\V1\TurmasController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\EnrollmentController;
+use App\Http\Controllers\Api\V1\GradeController;
+use App\Http\Controllers\Api\V1\SchoolClassController;
+use App\Http\Controllers\Api\V1\StudentController;
+use App\Http\Controllers\Api\V1\SubjectController;
+use App\Http\Controllers\Api\V1\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// PUBLIC ROUTES
 
-//  ROTAS PÚBLICAS
-
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
-// ✔SELF-SERVICE REGISTO
-Route::post('/register/aluno', [AuthController::class, 'registerAluno']);
-Route::post('/register/docente', [AuthController::class, 'registerDocente']);
-
-
-//  ROTAS PROTEGIDAS
-
-Route::middleware(['auth:sanctum', 'active'])->group(function () {
-
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    // TESTE TEMPORÁRIO — remove depois de confirmar que funciona
-    Route::get('/ping', function (Request $request) {
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/change-password', [AuthController::class, 'resetPassword']);
+    Route::get('/change-password', function (Request $request) {
         return response()->json([
-            'user'     => $request->user(),
-            'token_id' => $request->user()->currentAccessToken()->id
+            'message' => 'Use the token and email to reset your password via POST /api/auth/reset-password',
+            'token'   => $request->query('token'),
+            'email'   => $request->query('email'),
         ]);
     });
 
+    // SELF-SERVICE REGISTRATION
+    Route::post('/register/student', [AuthController::class, 'registerStudent']);
+    Route::post('/register/teacher', [AuthController::class, 'registerTeacher']);
+});
 
-    //  ADMIN
+// PROTECTED ROUTES
+
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
+
+    Route::prefix('auth')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/profile', [AuthController::class, 'profile']);
+    });
+
+    // TEMPORARY TEST — remove after confirming it works
+    Route::get('/ping', function (Request $request) {
+        return response()->json([
+            'user'     => $request->user(),
+            'token_id' => $request->user()->currentAccessToken()->id,
+        ]);
+    });
+
+    // ADMIN
 
     Route::middleware('role:admin')
         ->prefix('admin')
@@ -48,63 +58,59 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
             Route::get('/dashboard', [AdminDashboard::class, 'admin']);
 
-            Route::get('docentes/pending', [DocentesController::class, 'pending']);
-            Route::post('docentes/{docente}/approve', [DocentesController::class, 'approve']);
-            Route::post('docentes/{docente}/reject', [DocentesController::class, 'reject']);
-            Route::apiResource('alunos', AlunoController::class);
-            Route::apiResource('docentes', DocentesController::class);
-            Route::apiResource('cursos', CursosController::class);
-            Route::apiResource('turmas', TurmasController::class);
-            Route::apiResource('disciplinas', DisciplinasController::class);
-            Route::apiResource('notas', NotasController::class);
-            Route::apiResource('matriculas', MatriculasController::class);
+            Route::get('teachers/pending', [TeacherController::class, 'pending']);
+            Route::post('teachers/{teacher}/approve', [TeacherController::class, 'approve']);
+            Route::post('teachers/{teacher}/reject', [TeacherController::class, 'reject']);
+
+            Route::apiResource('students', StudentController::class);
+            Route::apiResource('teachers', TeacherController::class);
+            Route::apiResource('courses', CourseController::class);
+            Route::apiResource('classes', SchoolClassController::class);
+            Route::apiResource('subjects', SubjectController::class);
+            Route::apiResource('grades', GradeController::class);
+            Route::apiResource('enrollments', EnrollmentController::class);
         });
 
+    // TEACHER
 
-    //  DOCENTE
-
-    Route::middleware('role:docente')
-        ->prefix('docente')
-        ->name('docente.')
+    Route::middleware('role:teacher')
+        ->prefix('teacher')
+        ->name('teacher.')
         ->group(function () {
 
-            Route::get('/dashboard', [AdminDashboard::class, 'docente']);
+            Route::get('/dashboard', [AdminDashboard::class, 'teacher']);
 
-            // Rotas que docente pode usar
-            Route::get('notas', [NotasController::class, 'index']);      // Listar todas notas
-            Route::post('notas', [NotasController::class, 'store']);     // Criar nota
-            Route::get('notas/{nota}', [NotasController::class, 'show']); // Ver nota específica
+            Route::get('grades', [GradeController::class, 'index']);
+            Route::post('grades', [GradeController::class, 'store']);
+            Route::get('grades/{grade}', [GradeController::class, 'show']);
 
+            Route::get('classes', [SchoolClassController::class, 'index']);
+            Route::get('classes/{class}', [SchoolClassController::class, 'show']);
 
-            Route::get('turmas', [TurmasController::class, 'index']);
-            Route::get('turmas/{turma}', [TurmasController::class, 'show']);
+            Route::get('courses', [CourseController::class, 'index']);
+            Route::get('subjects', [SubjectController::class, 'index']);
 
-
-            Route::get('cursos', [CursosController::class, 'index']);
-            Route::get('disciplinas', [DisciplinasController::class, 'index']);
-
-            Route::get('perfil', [DocentesController::class, 'meuPerfil']);
-            Route::patch('perfil', [DocentesController::class, 'actualizarMeuPerfil']);
+            Route::get('profile', [TeacherController::class, 'myProfile']);
+            Route::patch('profile', [TeacherController::class, 'updateMyProfile']);
         });
 
+    // STUDENT
 
-    // 🎓 ALUNO
-
-    Route::middleware('role:aluno')
-        ->prefix('aluno')
-        ->name('aluno.')
+    Route::middleware('role:student')
+        ->prefix('student')
+        ->name('student.')
         ->group(function () {
 
-            Route::get('/dashboard', [AdminDashboard::class, 'aluno']);
+            Route::get('/dashboard', [AdminDashboard::class, 'student']);
 
-            Route::get('perfil', [AlunoController::class, 'meuPerfil']);
-            Route::patch('perfil', [AlunoController::class, 'atualizarMeuPerfil']);
+            Route::get('profile', [StudentController::class, 'myProfile']);
+            Route::patch('profile', [StudentController::class, 'updateMyProfile']);
 
-            Route::get('notas', [NotasController::class, 'minhasNotas']);
+            Route::get('grades', [GradeController::class, 'myGrades']);
 
-            Route::get('turmas/{turma}', [TurmasController::class, 'show']);
+            Route::get('classes/{class}', [SchoolClassController::class, 'show']);
 
-            Route::get('cursos', [CursosController::class, 'index']);
-            Route::get('disciplinas', [DisciplinasController::class, 'index']);
+            Route::get('courses', [CourseController::class, 'index']);
+            Route::get('subjects', [SubjectController::class, 'index']);
         });
 });

@@ -2,24 +2,25 @@
 
 namespace App\Providers;
 
-use App\Models\Aluno;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Curso;
-use App\Models\Disciplina;
-use App\Models\Docente;
-use App\Models\Matricula;
-use App\Models\Nota;
-use App\Models\Turma;
+use App\Models\Course;
+use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\SchoolClass;
+use App\Models\Subject;
+use App\Models\Enrollment;
+use App\Models\Grade;
 use App\Models\User;
-use App\Policies\CursoPolicy;
-use App\Policies\DocentePolicy;
-use App\Policies\AlunoPolicy;
-use App\Policies\NotaPolicy;
-use App\Policies\DisciplinaPolicy;
-use App\Policies\MatriculaPolicy;
-use App\Policies\TurmaPolicy;
+use App\Policies\CoursePolicy;
+use App\Policies\StudentPolicy;
+use App\Policies\TeacherPolicy;
+use App\Policies\SchoolClassPolicy;
+use App\Policies\SubjectPolicy;
+use App\Policies\EnrollmentPolicy;
+use App\Policies\GradePolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,13 +31,17 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::policy(Curso::class, CursoPolicy::class);
-        Gate::policy(Aluno::class, AlunoPolicy::class);
-        Gate::policy(Docente::class, DocentePolicy::class);
-        Gate::policy(Turma::class, TurmaPolicy::class);
-        Gate::policy(Disciplina::class, DisciplinaPolicy::class);
-        Gate::policy(Matricula::class, MatriculaPolicy::class);
-        Gate::policy(Nota::class, NotaPolicy::class);
+        Gate::policy(Course::class, CoursePolicy::class);
+        Gate::policy(Student::class, StudentPolicy::class);
+        Gate::policy(Teacher::class, TeacherPolicy::class);
+        Gate::policy(SchoolClass::class, SchoolClassPolicy::class);
+        Gate::policy(Subject::class, SubjectPolicy::class);
+        Gate::policy(Enrollment::class, EnrollmentPolicy::class);
+        Gate::policy(Grade::class, GradePolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+
+        ResetPassword::createUrlUsing(function (User $user, string $token) {
+            return url('/api/auth/change-password?token=' . $token . '&email=' . urlencode($user->email));
+        });
     }
 }

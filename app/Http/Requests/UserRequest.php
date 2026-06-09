@@ -3,52 +3,56 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Override;
 
 class UserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return $this->user()->can('create', User::class);
+        return $this->user()
+            ? $this->user()->can('create', User::class)
+            : false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,user',
-            'status' => 'required|in:active,approved',
-            'telefone' => 'required|string|max:255',
-            'bi' => 'required|string|max:255',
-            'genero' => 'required|in:male,female',
+
+            'role'     => 'required|in:admin,user,teacher,student',
+            'status'   => 'required|in:active,inactive,pending',
+
+            'phone'    => 'nullable|string|max:20',
+
+            // Optional identity fields (only if your system really needs them)
+            'bi'       => 'nullable|string|max:50',
+            'gender'   => 'nullable|in:male,female',
         ];
     }
 
-    #[Override]
-    public function messages()
+    public function messages(): array
     {
         return [
-            'name.required' => 'O nome é obrigatório.',
-            'email.required' => 'O email é obrigatório.',
-            'password.required' => 'A senha é obrigatória.',
-            'role.required' => 'A função é obrigatória.',
-            'status.required' => 'O status é obrigatório.',
-            'telefone.required' => 'O telefone é obrigatório.',
-            'bi.required' => 'O bi é obrigatório.',
-            'genero.required' => 'O gênero é obrigatório.',
-            'email.unique' => 'O email já está sendo utilizado.',
+            'name.required'     => 'Name is required.',
+            'email.required'    => 'Email is required.',
+            'email.email'       => 'Email must be valid.',
+            'email.unique'      => 'Email is already in use.',
+
+            'password.required' => 'Password is required.',
+            'password.min'      => 'Password must be at least 8 characters.',
+            'password.confirmed'=> 'Password confirmation does not match.',
+
+            'role.required'     => 'Role is required.',
+            'role.in'           => 'Invalid role.',
+
+            'status.required'   => 'Status is required.',
+            'status.in'         => 'Invalid status.',
+
+            'phone.string'      => 'Phone must be a string.',
+
+            'gender.in'         => 'Gender must be male or female.',
         ];
     }
 }

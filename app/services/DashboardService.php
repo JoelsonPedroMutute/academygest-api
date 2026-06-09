@@ -2,33 +2,32 @@
 
 namespace App\Services\V1\Dashboard;
 
-use App\Services\AlunoService;
-use App\Services\DocenteService;
-use App\Services\CursoService;
-use App\Services\TurmaService;
-use App\Services\AulaService;
+use App\Services\StudentService;
+use App\Services\TeacherService;
+use App\Services\CourseService;
+use App\Services\SchoolClassService;
 
 class AdminDashboardService
 {
     public function __construct(
-        protected AlunoService $alunoService,
-        protected DocenteService $docenteService,
-        protected CursoService $cursoService,
-        protected TurmaService $turmaService,
+        protected StudentService $studentService,
+        protected TeacherService $teacherService,
+        protected CourseService $courseService,
+        protected SchoolClassService $schoolClassService,
     ) {}
 
     public function getData(): array
     {
         return [
-            'total_alunos'   => $this->alunoService->total(),
-            'total_docentes' => $this->docenteService->total(),
-            'total_cursos'   => $this->cursoService->total(),
-            'total_turmas'   => $this->turmaService->total(),
+            'total_students' => $this->studentService->total(),
+            'total_teachers' => $this->teacherService->total(),
+            'total_courses'  => $this->courseService->total(),
+            'total_classes'  => $this->schoolClassService->total(),
 
-            'alunos_recentes'   => $this->alunoService->recentes(5),
-            'docentes_recentes' => $this->docenteService->recentes(5),
-            'cursos_recentes'   => $this->cursoService->recentes(5),
-            'turmas_recentes'   => $this->turmaService->recentes(5),
+            'recent_students' => $this->studentService->recent(5),
+            'recent_teachers' => $this->teacherService->recent(5),
+            'recent_courses'  => $this->courseService->recent(5),
+            'recent_classes'  => $this->schoolClassService->recent(5),
         ];
     }
 }

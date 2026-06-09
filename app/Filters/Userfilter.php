@@ -16,7 +16,7 @@ class UserFilter
                 $q->where(function ($sub) use ($search) {
                     $sub->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('telefone', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%");
                 })
             )
 

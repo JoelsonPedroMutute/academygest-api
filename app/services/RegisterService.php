@@ -8,30 +8,30 @@ class RegisterService
 {
     public function __construct(
         private UserService $userService,
-        private DocenteService $docenteService
+        private TeacherService $teacherService
     ) {}
 
-    public function registerDocente(array $data): array
+    public function registerTeacher(array $data): array
     {
         return DB::transaction(function () use ($data) {
 
-            $user = $this->userService->criar([
+            $user = $this->userService->create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => $data['password'],
-                'role'     => 'docente',
-                'telefone' => $data['telefone'] ?? null,
+                'role'     => 'teacher',
+                'phone'    => $data['phone'] ?? null,
                 'status'   => 'pending',
             ]);
 
-            $docente = $this->docenteService->criar(
+            $teacher = $this->teacherService->create(
                 $data,
                 'public'
             );
 
             return [
                 'user' => $user,
-                'docente' => $docente,
+                'teacher' => $teacher,
                 'message' => 'Registo enviado.'
             ];
         });

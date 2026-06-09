@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Filters\UserFilter;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -13,34 +11,31 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasUuids;
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'name',
         'email',
         'password',
-        'telefone',
-        'endereco',
-        'bi',
-        'genero',
+        'phone',
+        'address',
+        'national_id',
+        'gender',
         'role',
-        'status'
+        'status',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -48,19 +43,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function aluno()
+
+    public function student()
     {
-        return $this->hasOne(Aluno::class);
+        return $this->hasOne(Student::class);
     }
 
-    public function docente()
+    public function teacher()
     {
-        return $this->hasOne(Docente::class);
+        return $this->hasOne(Teacher::class);
     }
 
-
-    public function scopeFiltered(Builder $query, array $filters)
+    public function scopeFiltered(Builder $query, array $filters): Builder
     {
         return UserFilter::apply($query, $filters);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
     }
 }

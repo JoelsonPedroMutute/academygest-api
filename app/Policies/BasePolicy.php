@@ -16,7 +16,7 @@ class BasePolicy
             return false;
         }
 
-        return null; // deixa continuar para a policy específica
+        return null; // let the specific policy handle it
     }
 
     protected function isAdmin(User $user): bool
@@ -24,13 +24,13 @@ class BasePolicy
         return $user->role === 'admin';
     }
 
-    protected function isDocente(User $user): bool
+    protected function isTeacher(User $user): bool
     {
-        return $user->role === 'docente';
+        return $user->role === 'teacher';
     }
 
-    protected function isAluno(User $user): bool
+    protected function isStudent(User $user): bool
     {
-        return $user->role === 'aluno';
+        return $user->role === 'student';
     }
 }

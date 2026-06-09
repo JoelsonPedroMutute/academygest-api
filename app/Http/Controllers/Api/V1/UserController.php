@@ -21,7 +21,7 @@ class UserController extends BaseController
     {
         $this->authorize('viewAny', User::class);
 
-        $users = $this->userService->listarFiltrado(
+        $users = $this->userService->listFiltered(
             $request->validated()
         );
 
@@ -39,7 +39,7 @@ class UserController extends BaseController
     {
         $this->authorize('create', User::class);
 
-        $user = $this->userService->criar(
+        $user = $this->userService->create(
             $request->validated()
         );
 
@@ -52,7 +52,7 @@ class UserController extends BaseController
     ) {
         $this->authorize('update', $user);
 
-        $user = $this->userService->atualizar(
+        $user = $this->userService->update(
             $user->id,
             $request->validated()
         );
@@ -64,7 +64,7 @@ class UserController extends BaseController
     {
         $this->authorize('delete', $user);
 
-        $this->userService->deletar($user->id);
+        $this->userService->delete($user->id);
 
         return $this->success(
             'Utilizador eliminado com sucesso.'

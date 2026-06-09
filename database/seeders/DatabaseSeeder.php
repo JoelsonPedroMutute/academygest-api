@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ─── Admin inicial do sistema ────────────────────────────────
+        
         User::create([
             'name'     => 'Joelson Pedo Mutute',
             'email'    => 'joelsonmututedev@gmail.com',

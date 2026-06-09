@@ -9,42 +9,41 @@ class BaseService
 {
     protected string $model;
 
-    public function listar(int $perPage = 15): LengthAwarePaginator
+    public function list(int $perPage = 15): LengthAwarePaginator
     {
         return ($this->model)::query()->paginate($perPage);
     }
 
-    public function criar(array $data): Model
+    public function create(array $data): Model
     {
         return ($this->model)::create($data);
     }
 
-    public function buscarPorId(int $id): Model
+    public function findById(int $id): Model
     {
         return ($this->model)::findOrFail($id);
     }
 
-    public function atualizar(int $id, array $dados): Model
+    public function update(int $id, array $data): Model
     {
-        $model = $this->buscarPorId($id);
-        $model->update($dados);
+        $model = $this->findById($id);
+        $model->update($data);
 
         return $model->fresh();
     }
 
-    public function deletar(int $id): void
+    public function delete(int $id): void
     {
-        $this->buscarPorId($id)->delete();
+        $this->findById($id)->delete();
     }
 
-    //  ADDIÇÃO NECESSÁRIA
     public function total(): int
     {
         return ($this->model)::count();
     }
 
-    public function recentes(int $limite = 5)
+    public function recent(int $limit = 5)
     {
-        return ($this->model)::latest()->limit($limite)->get();
+        return ($this->model)::latest()->limit($limit)->get();
     }
 }

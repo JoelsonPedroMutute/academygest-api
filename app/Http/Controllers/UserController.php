@@ -6,24 +6,20 @@ use App\Http\Controllers\Api\V1\BaseController;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\Aluno;
-use App\Models\Docente;
+use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
-    /*
-    |--------------------------------------------------------------------------
-    | CRIAÇÃO
-    |--------------------------------------------------------------------------
-    */
+
     public function store(StoreUserRequest $request)
     {
         $this->authorize('create', User::class);
 
         $data = $request->validated();
 
-        // proteção: só admin pode criar admin
+
         if (
             $data['role'] === 'admin' &&
             Auth()->Auth::user()->role !== 'admin'
@@ -38,26 +34,22 @@ class UserController extends BaseController
             'role'     => $data['role'],
         ]);
 
-        // criação de perfil dependente (regra de domínio)
+
         $this->createProfile($user);
 
         return new UserResource($user);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LÓGICA DE PERFIL (DOMAIN RULE)
-    |--------------------------------------------------------------------------
-    */
+
     private function createProfile(User $user): void
     {
         match ($user->role) {
-            'aluno' => Aluno::create([
-                'user_id' => $user->id,
+            'student' => Student::create([
+                'user_uuid' => $user->id,
             ]),
 
-            'docente' => Docente::create([
-                'user_id' => $user->id,
+            'teacher' => Teacher::create([
+                'user_uuid' => $user->id,
             ]),
 
             default => null,
