@@ -36,16 +36,21 @@ class SchoolClass extends Model
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'class_subject');
+        return $this->belongsToMany(Subject::class, 'school_class_subject', 'class_id', 'subject_id');
     }
 
     public function students()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Student::class, 'class_id'); // ← adiciona 'class_id'
     }
 
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasMany(Enrollment::class, 'class_id'); // ← adiciona 'class_id'
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id';
     }
 }

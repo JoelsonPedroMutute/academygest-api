@@ -43,8 +43,18 @@ class Student extends Model
         return $this->hasMany(Grade::class);
     }
 
-    public function class()
+    // Antes
+    public function schoolClass()
     {
-        return $this->belongsTo(SchoolClass::class);
+        return $this->belongsTo(SchoolClass::class, 'class_id');
+    }
+
+    public function turma()
+    {
+        return $this->schoolClass();
+    }
+    public function notas()
+    {
+        return $this->hasMany(Grade::class);
     }
 }
