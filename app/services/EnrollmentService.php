@@ -2,67 +2,24 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Filters\EnrollmentFilter;
+use App\Models\Enrollment;
 
 class EnrollmentService extends BaseService
 {
-    public function __construct()
-    {
-        $this->model = User::class;
+    public function __construct(
+        protected EnrollmentFilter $filter
+    ) {
+        $this->model = Enrollment::class;
     }
 
-    public function create(array $data): User
+    public function listFiltered(array $filters = [])
     {
-        return User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role'     => $data['role'],
-            'phone'    => $data['phone'] ?? null,
-            'status'   => $data['status'] ?? 'active',
-        ]);
-    }
+        $query = Enrollment::query()
+            ->with(['student', 'schoolClass']);
 
-    public function update(int|User $id, array $data): User
-    {
-        $user = $id instanceof User
-            ? $id
-            : $this->findById($id);
+        $this->filter->apply($query, $filters);
 
-        $user->update([
-            'name'  => $data['name'] ?? $user->name,
-            'email' => $data['email'] ?? $user->email,
-            'phone' => $data['phone'] ?? $user->phone,
-        ]);
-
-        if (!empty($data['password'])) {
-            $user->update([
-                'password' => Hash::make($data['password']),
-            ]);
-        }
-
-        return $user->fresh();
-    }
-
-    public function activate(User $user): bool
-    {
-        return $user->update([
-            'status' => 'active',
-        ]);
-    }
-
-    public function deactivate(User $user): bool
-    {
-        return $user->update([
-            'status' => 'inactive',
-        ]);
-    }
-
-    public function listFiltered(array $filters)
-    {
-        return User::query()
-            ->filtered($filters)
-            ->paginate(10);
+        return $query->latest()->paginate(10)->withQueryString();
     }
 }

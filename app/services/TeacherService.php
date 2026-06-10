@@ -52,7 +52,7 @@ class TeacherService extends BaseService
         });
     }
 
-    public function update(int $id, array $data): Teacher
+    public function update(string $id, array $data): Teacher
     {
         return DB::transaction(function () use ($id, $data) {
 
@@ -104,5 +104,13 @@ class TeacherService extends BaseService
         ]);
 
         return $teacher->fresh(['user']);
+    }
+    public function delete(string $id): void
+    {
+        DB::transaction(function () use ($id) {
+            $teacher = $this->findById($id);
+            $teacher->user()->delete();
+            $teacher->delete();
+        });
     }
 }

@@ -56,7 +56,7 @@ class StudentService extends BaseService
         });
     }
 
-    public function update(int $id, array $data): Student
+    public function update(string $id, array $data): Student
     {
         $student = $this->findById($id);
 
@@ -70,13 +70,13 @@ class StudentService extends BaseService
         return $student->fresh(['user', 'schoolClass']);
     }
 
-   public function delete(int $id): void
-{
-    $student = $this->findById($id);
+    public function delete(string $id): void
+    {
+        $student = $this->findById($id);
 
-    $student->user->delete();
-    $student->delete();
-}
+        $student->user->delete();
+        $student->delete();
+    }
 
     public function restore(string $id): bool
     {

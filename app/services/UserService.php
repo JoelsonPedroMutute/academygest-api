@@ -24,7 +24,7 @@ class UserService extends BaseService
         ]);
     }
 
-    public function update(int|User $id, array $data): User
+    public function update(string|User $id, array $data): User
     {
         $user = $id instanceof User
             ? $id

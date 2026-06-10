@@ -43,22 +43,33 @@ class SchoolClassService extends BaseService
         return parent::create($data);
     }
 
-    public function update(int $id, array $data): SchoolClass
+    public function update(string $id, array $data): SchoolClass
     {
         $schoolClass = $this->findById($id);
 
-        if (
-            SchoolClass::where('name', $data['name'])
-            ->where('id', '!=', $id)
-            ->exists()
-        ) {
-            throw new \Exception(
-                'A school class with this name already exists.'
-            );
+        if (isset($data['name'])) {
+            if (
+                SchoolClass::where('name', $data['name'])
+                ->where('id', '!=', $id)
+                ->exists()
+            ) {
+                throw new \Exception('A school class with this name already exists.');
+            }
         }
 
         $schoolClass->update($data);
 
         return $schoolClass->fresh(['course', 'students', 'subjects']);
+    }
+    public function delete(string $id): void
+    {
+        $schoolClass = $this->findById($id);
+
+        // opcional: verificar se tem alunos ou enrollments associados
+        if ($schoolClass->students()->count() > 0) {
+            throw new \Exception('Cannot delete a class with enrolled students.');
+        }
+
+        $schoolClass->delete();
     }
 }

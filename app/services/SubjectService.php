@@ -40,7 +40,7 @@ class SubjectService extends BaseService
         return parent::create($data);
     }
 
-   public function update(int $id, array $data): Subject
+   public function update(string $id, array $data): Subject
 {
     $subject = $this->findById($id);
 

@@ -19,20 +19,19 @@ class BaseService
         return ($this->model)::create($data);
     }
 
-    public function findById(int $id): Model
+    public function findById(string $id): Model
     {
         return ($this->model)::findOrFail($id);
     }
 
-    public function update(int $id, array $data): Model
+    public function update(string $id, array $data): Model
     {
         $model = $this->findById($id);
         $model->update($data);
-
         return $model->fresh();
     }
 
-    public function delete(int $id): void
+    public function delete(string $id): void
     {
         $this->findById($id)->delete();
     }
