@@ -9,19 +9,19 @@ class UserResource extends JsonResource
     public function toArray($request): array
     {
         $data = [
-            'uuid' => $this->uuid,
-            'name' => $this->name,
-            'email' => $this->email,
-            'role' => $this->role,
-            'profile_picture' => null, // We'll handle this once we have the column
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'email'           => $this->email,
+            'role'            => $this->role,
+            'status'          => $this->status,
+            'profile_picture' => null,
         ];
 
-        // Only include academic data for non-admin users
         if ($this->role !== 'admin') {
-            $data['phone'] = $this->telefone;
-            $data['address'] = $this->endereco;
-            $data['bi'] = $this->bi;
-            $data['gender'] = $this->genero;
+            $data['phone']       = $this->phone;
+            $data['address']     = $this->address;
+            $data['national_id'] = $this->national_id;
+            $data['gender']      = $this->gender;
         }
 
         return $data;

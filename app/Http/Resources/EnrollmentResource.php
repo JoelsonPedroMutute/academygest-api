@@ -9,20 +9,14 @@ class EnrollmentResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'uuid' => $this->uuid,
-
-            'academic_year' => $this->academic_year,
-            'semester' => $this->semester,
+            'id'              => $this->id,
+            'academic_year'   => $this->academic_year,
+            'semester'        => $this->semester,
             'enrollment_date' => $this->enrollment_date,
-            'status' => $this->status,
+            'status'          => $this->status,
 
-            'student' => StudentResource::make(
-                $this->whenLoaded('student')
-            ),
-
-            'school_class' => SchoolClassResource::make(
-                $this->whenLoaded('schoolClass')
-            ),
+            'student'      => StudentResource::make($this->whenLoaded('student')),
+            'school_class' => SchoolClassResource::make($this->whenLoaded('schoolClass')),
         ];
     }
 }

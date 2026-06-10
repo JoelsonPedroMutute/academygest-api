@@ -9,18 +9,13 @@ class SubjectResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'uuid' => $this->uuid,
-            'name' => $this->n,
-            'description' => $this->descricao,
-            'hourly_load' => $this->carga_horaria,
+            'id'          => $this->id,
+            'name'        => $this->name,
+            'description' => $this->description,
+            'workload'    => $this->workload,
 
-            'course' => CourseResource::make(
-                $this->whenLoaded('curso')
-            ),
-
-            'school_classes' => SchoolClassResource::collection(
-                $this->whenLoaded('schoolClasses')
-            ),
+            'course'         => CourseResource::make($this->whenLoaded('course')),
+            'school_classes' => SchoolClassResource::collection($this->whenLoaded('classes')),
         ];
     }
 }
