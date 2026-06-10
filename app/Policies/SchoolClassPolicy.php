@@ -2,10 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Enrollment;
-use App\Models\Turma;
+use App\Models\SchoolClass;
 use App\Models\User;
-use App\Policies\BasePolicy;
 
 class SchoolClassPolicy extends BasePolicy
 {
@@ -14,15 +12,9 @@ class SchoolClassPolicy extends BasePolicy
         return $this->isTeacher($user);
     }
 
-    public function view(User $user, Enrollment $enrollment): bool
+    public function view(User $user, SchoolClass $schoolClass): bool
     {
-        if ($this->isTeacher($user)) return true;
-
-        if ($this->isStudent($user)) {
-            return $user->student?->enrollments_id === $enrollment->id;
-        }
-
-        return false;
+        return $this->isTeacher($user);
     }
 
     public function create(User $user): bool
@@ -30,12 +22,12 @@ class SchoolClassPolicy extends BasePolicy
         return $this->isAdmin($user);
     }
 
-    public function update(User $user, Enrollment $enrollment): bool
+    public function update(User $user, SchoolClass $schoolClass): bool
     {
         return $this->isAdmin($user);
     }
 
-    public function delete(User $user, Enrollment $enrollment): bool
+    public function delete(User $user, SchoolClass $schoolClass): bool
     {
         return $this->isAdmin($user);
     }
