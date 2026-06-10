@@ -4,33 +4,32 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-use App\Models\Curso;
-use App\Models\Aluno;
-use App\Models\Disciplina;
-use App\Models\Docente;
-use App\Models\Matricula;
-use App\Models\Nota;
-use App\Models\Turma;
+use App\Models\Course;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\Teacher;
+use App\Models\Enrollment;
+use App\Models\Grade;
+use App\Models\SchoolClass;
 
-use App\Policies\CursoPolicy;
-use App\Policies\AlunoPolicy;
-use App\Policies\DisciplinaPolicy;
-use App\Policies\DocentePolicy;
-use App\Policies\MatriculaPolicy;
-use App\Policies\NotaPolicy;
-use App\Policies\TurmaPolicy;
-
+use App\Policies\CoursePolicy;
+use App\Policies\StudentPolicy;
+use App\Policies\SubjectPolicy;
+use App\Policies\TeacherPolicy;
+use App\Policies\EnrollmentPolicy;
+use App\Policies\GradePolicy;
+use App\Policies\SchoolClassPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        Curso::class => CursoPolicy::class,
-        Aluno::class => AlunoPolicy::class,
-        Disciplina::class => DisciplinaPolicy::class,
-        Docente::class => DocentePolicy::class,
-        Matricula::class => MatriculaPolicy::class,
-        Nota::class => NotaPolicy::class,
-        Turma::class => TurmaPolicy::class,
+        Course::class      => CoursePolicy::class,
+        Student::class     => StudentPolicy::class,
+        Subject::class     => SubjectPolicy::class,
+        Teacher::class     => TeacherPolicy::class,
+        Enrollment::class  => EnrollmentPolicy::class,
+        Grade::class       => GradePolicy::class,
+        SchoolClass::class => SchoolClassPolicy::class,
     ];
 
     public function boot(): void

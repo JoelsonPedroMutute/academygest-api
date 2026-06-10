@@ -2,23 +2,28 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
     public function toArray($request): array
     {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'telefone' => $this->telefone,
-            'endereco' => $this->endereco,
-            'bi' => $this->bi,
-            'genero' => $this->genero,
-            'role' => $this->role,
-            'status' => $this->status,
+        $data = [
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'email'           => $this->email,
+            'role'            => $this->role,
+            'status'          => $this->status,
+            'profile_picture' => null,
         ];
+
+        if ($this->role !== 'admin') {
+            $data['phone']       = $this->phone;
+            $data['address']     = $this->address;
+            $data['national_id'] = $this->national_id;
+            $data['gender']      = $this->gender;
+        }
+
+        return $data;
     }
 }

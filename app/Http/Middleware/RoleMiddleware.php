@@ -13,7 +13,7 @@ class RoleMiddleware
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Não autenticado.'], 401); // ✅ sem redirect
+            return response()->json(['message' => 'Não autenticado.'], 401); // 
         }
 
         if (!in_array($user->role, $roles)) {

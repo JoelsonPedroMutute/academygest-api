@@ -1,0 +1,1475 @@
+{
+  "rotas": {
+    "publicas": [
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/login",
+        "controlador": "AuthController",
+        "acao": "login",
+        "middleware": [],
+        "body": {
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório)"
+        },
+        "response": {
+          "success": true,
+          "message": "Login realizado com sucesso.",
+          "data": {
+            "user": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174000",
+              "name": "John Doe",
+              "email": "john@example.com",
+              "role": "admin",
+              "profile_picture": null
+            },
+            "token": "1|abcdefghijklmnopqrstuvwxyz123456"
+          }
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/forgot-password",
+        "controlador": "AuthController",
+        "acao": "forgotPassword",
+        "middleware": [],
+        "body": {
+          "email": "string (obrigatório)"
+        },
+        "response": {
+          "success": true,
+          "message": "Reset link sent!",
+          "data": null
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/reset-password",
+        "controlador": "AuthController",
+        "acao": "resetPassword",
+        "middleware": [],
+        "body": {
+          "token": "string (obrigatório)",
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)"
+        },
+        "response": {
+          "success": true,
+          "message": "Password reset successfully!",
+          "data": null
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/change-password",
+        "controlador": "AuthController",
+        "acao": "resetPassword",
+        "middleware": [],
+        "body": {
+          "token": "string (obrigatório)",
+          "email": "string (obrigatório)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)"
+        },
+        "response": {
+          "success": true,
+          "message": "Password reset successfully!",
+          "data": null
+        }
+      },
+      {
+        "metodo": "GET",
+        "caminho": "/api/auth/change-password",
+        "controlador": null,
+        "acao": "closure",
+        "middleware": [],
+        "body": null,
+        "response": {
+          "message": "Use the token and email to reset your password via POST /api/auth/reset-password",
+          "token": "reset-token-123",
+          "email": "user@example.com"
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/register/student",
+        "controlador": "AuthController",
+        "acao": "registerStudent",
+        "middleware": [],
+        "body": {
+          "name": "string (obrigatório, max:255)",
+          "email": "string (obrigatório, email, max:255, único)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)",
+          "class_id": "uuid (opcional, existe em school_classes)",
+          "birth_date": "date (obrigatório, anterior a hoje)"
+        },
+        "response": {
+          "success": true,
+          "message": "Student registered successfully.",
+          "data": {
+            "id": 1,
+            "user": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174001",
+              "name": "Student Name",
+              "email": "student@example.com",
+              "role": "student",
+              "profile_picture": null,
+              "phone": null,
+              "address": null,
+              "bi": null,
+              "gender": null
+            },
+            "birth_date": "2000-01-01"
+          }
+        }
+      },
+      {
+        "metodo": "POST",
+        "caminho": "/api/auth/register/teacher",
+        "controlador": "AuthController",
+        "acao": "registerTeacher",
+        "middleware": [],
+        "body": {
+          "name": "string (obrigatório, max:255)",
+          "email": "string (obrigatório, email, único)",
+          "password": "string (obrigatório, min:6, confirmed)",
+          "password_confirmation": "string (obrigatório)",
+          "phone": "string (opcional, nullable, max:20)",
+          "specialty": "string (opcional, nullable, max:255)",
+          "birth_date": "date (opcional, nullable, anterior a hoje)"
+        },
+        "response": {
+          "success": true,
+          "message": "Registration submitted. Awaiting approval.",
+          "data": {
+            "uuid": "123e4567-e89b-12d3-a456-426614174002",
+            "birth_date": "1985-05-15",
+            "specialty": "Mathematics",
+            "user": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174003",
+              "name": "Teacher Name",
+              "email": "teacher@example.com",
+              "role": "teacher",
+              "profile_picture": null,
+              "phone": null,
+              "address": null,
+              "bi": null,
+              "gender": null
+            }
+          }
+        }
+      }
+    ],
+    "protegidas": {
+      "autenticadas": [
+        {
+          "metodo": "POST",
+          "caminho": "/api/auth/logout",
+          "controlador": "AuthController",
+          "acao": "logout",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Logged out successfully.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/auth/profile",
+          "controlador": "AuthController",
+          "acao": "profile",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Profile loaded successfully.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174000",
+              "name": "John Doe",
+              "email": "john@example.com",
+              "role": "admin",
+              "profile_picture": null
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/ping",
+          "controlador": null,
+          "acao": "closure",
+          "middleware": ["auth:sanctum", "active"],
+          "body": null,
+          "response": {
+            "user": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174000",
+              "name": "John Doe",
+              "email": "john@example.com",
+              "role": "admin"
+            },
+            "token_id": 1
+          }
+        }
+      ],
+      "admin": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "admin",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Operação realizada com sucesso.",
+            "data": {}
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/teachers/pending",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "pending",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docentes pendentes listados com sucesso.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174004",
+                "birth_date": "1985-05-15",
+                "specialty": "Mathematics",
+                "user": {
+                  "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                  "name": "Pending Teacher",
+                  "email": "pending@example.com",
+                  "role": "teacher",
+                  "profile_picture": null,
+                  "phone": null,
+                  "address": null,
+                  "bi": null,
+                  "gender": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/teachers/{teacher}/approve",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "approve",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docente aprovado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Mathematics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Pending Teacher",
+                "email": "pending@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/teachers/{teacher}/reject",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "reject",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docente rejeitado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Mathematics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Pending Teacher",
+                "email": "pending@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/students",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Alunos listados com sucesso.",
+            "data": [
+              {
+                "id": 1,
+                "user": {
+                  "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                  "name": "Student Name",
+                  "email": "student@example.com",
+                  "role": "student",
+                  "profile_picture": null,
+                  "phone": null,
+                  "address": null,
+                  "bi": null,
+                  "gender": null
+                },
+                "birth_date": "2000-01-01"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/students",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255)",
+            "email": "string (obrigatório, email, max:255, único)",
+            "password": "string (obrigatório, min:6, confirmed)",
+            "password_confirmation": "string (obrigatório)",
+            "class_id": "uuid (opcional, existe em school_classes)",
+            "birth_date": "date (obrigatório, anterior a hoje)"
+          },
+          "response": {
+            "success": true,
+            "message": "Aluno criado com sucesso.",
+            "data": {
+              "id": 1,
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                "name": "Student Name",
+                "email": "student@example.com",
+                "role": "student",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              },
+              "birth_date": "2000-01-01"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/students/{student}",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Aluno encontrado com sucesso.",
+            "data": {
+              "id": 1,
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                "name": "Student Name",
+                "email": "student@example.com",
+                "role": "student",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              },
+              "birth_date": "2000-01-01"
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/students/{student}",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "email": "string (opcional, email, max:255, único)",
+            "password": "string (opcional, nullable, min:6, confirmed)",
+            "password_confirmation": "string (opcional)",
+            "school_class_id": "integer (opcional, existe em school_classes)",
+            "birth_date": "date (opcional, anterior a hoje)",
+            "student_number": "string (opcional, max:20, único)"
+          },
+          "response": {
+            "success": true,
+            "message": "Aluno atualizado com sucesso.",
+            "data": {
+              "id": 1,
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                "name": "Updated Name",
+                "email": "updated@example.com",
+                "role": "student",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              },
+              "birth_date": "2000-01-01"
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/students/{student}",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Aluno eliminado com sucesso.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/teachers",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docentes listados com sucesso.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174004",
+                "birth_date": "1985-05-15",
+                "specialty": "Mathematics",
+                "user": {
+                  "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                  "name": "Teacher Name",
+                  "email": "teacher@example.com",
+                  "role": "teacher",
+                  "profile_picture": null,
+                  "phone": null,
+                  "address": null,
+                  "bi": null,
+                  "gender": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/teachers",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255)",
+            "email": "string (obrigatório, email, único)",
+            "password": "string (obrigatório, min:6, confirmed)",
+            "password_confirmation": "string (obrigatório)",
+            "phone": "string (opcional, nullable, max:20)",
+            "specialty": "string (opcional, nullable, max:255)",
+            "birth_date": "date (opcional, nullable, anterior a hoje)"
+          },
+          "response": {
+            "success": true,
+            "message": "Docente criado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Mathematics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Teacher Name",
+                "email": "teacher@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/teachers/{teacher}",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docente encontrado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Mathematics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Teacher Name",
+                "email": "teacher@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/teachers/{teacher}",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255, único)",
+            "email": "string (opcional, email)",
+            "phone": "string (opcional, nullable, max:20)",
+            "specialty": "string (opcional, nullable, max:255)",
+            "birth_date": "date (opcional, nullable)"
+          },
+          "response": {
+            "success": true,
+            "message": "Docente atualizado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Physics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Updated Teacher",
+                "email": "updated-teacher@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/teachers/{teacher}",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Docente eliminado com sucesso.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/courses",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174006",
+                "name": "Computer Science",
+                "description": "Introduction to programming",
+                "duration": 4
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/courses",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255, único)",
+            "duration": "integer (opcional, nullable, min:1, max:10)",
+            "description": "string (opcional, nullable)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174006",
+              "name": "Computer Science",
+              "description": "Introduction to programming",
+              "duration": 4
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/courses/{course}",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174006",
+              "name": "Computer Science",
+              "description": "Introduction to programming",
+              "duration": 4
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/courses/{course}",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255, único)",
+            "duration": "integer (opcional, nullable, min:1, max:10)",
+            "description": "string (opcional, nullable)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174006",
+              "name": "Updated Course",
+              "description": "Updated description",
+              "duration": 5
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/courses/{course}",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Curso eliminado com sucesso.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/classes",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174007",
+                "name": "Class 1A",
+                "academic_year": "2023",
+                "semester": 1,
+                "capacity": 30,
+                "shift": "morning"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/classes",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255)",
+            "course_id": "integer (obrigatório, existe em courses)",
+            "academic_year": "integer (obrigatório, min:1900, max:2027)",
+            "semester": "integer (obrigatório, min:1, max:2)",
+            "capacity": "integer (opcional, nullable, min:1)",
+            "shift": "string (opcional, nullable, em: morning, afternoon, night)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174007",
+              "name": "Class 1A",
+              "academic_year": "2023",
+              "semester": 1,
+              "capacity": 30,
+              "shift": "morning"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/classes/{school_class}",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174007",
+              "name": "Class 1A",
+              "academic_year": "2023",
+              "semester": 1,
+              "capacity": 30,
+              "shift": "morning"
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/classes/{school_class}",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "course_id": "integer (opcional, existe em courses)",
+            "academic_year": "string (opcional, max:20)",
+            "semester": "integer (opcional, min:1, max:2)",
+            "capacity": "integer (opcional, nullable, min:1)",
+            "shift": "string (opcional, nullable, em: morning, afternoon, evening)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174007",
+              "name": "Updated Class",
+              "academic_year": "2024",
+              "semester": 2,
+              "capacity": 35,
+              "shift": "afternoon"
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/classes/{school_class}",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "School class deleted successfully.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/subjects",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174008",
+                "name": "Mathematics",
+                "description": "Algebra and Calculus",
+                "hourly_load": 60
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/subjects",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255, único)",
+            "description": "string (opcional, nullable)",
+            "course_id": "integer (obrigatório, existe em cursos)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174008",
+              "name": "Mathematics",
+              "description": "Algebra and Calculus",
+              "hourly_load": 60
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/subjects/{subject}",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174008",
+              "name": "Mathematics",
+              "description": "Algebra and Calculus",
+              "hourly_load": 60
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/subjects/{subject}",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "name": "string (obrigatório, max:255, único)",
+            "description": "string (opcional, nullable)"
+          },
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174008",
+              "name": "Updated Subject",
+              "description": "Updated description",
+              "hourly_load": 60
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/subjects/{subject}",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Subject eliminada com sucesso.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/grades",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Notas listadas com sucesso.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174009",
+                "evaluations": {
+                  "trimester_exam": 15,
+                  "semester_exam": 16,
+                  "final_exam": 18
+                },
+                "final_average": 16.33,
+                "status": "approved"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/grades",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "student_id": "integer (obrigatório, existe em alunos)",
+            "subject_id": "integer (obrigatório, existe em disciplinas)",
+            "class_id": "integer (obrigatório, existe em turmas)",
+            "trimester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "semester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "final_exam": "numeric (opcional, nullable, min:0, max:20)"
+          },
+          "response": {
+            "success": true,
+            "message": "Nota criada com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174009",
+              "evaluations": {
+                "trimester_exam": 15,
+                "semester_exam": 16,
+                "final_exam": 18
+              },
+              "final_average": 16.33,
+              "status": "approved"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/grades/{grade}",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Nota encontrada com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174009",
+              "evaluations": {
+                "trimester_exam": 15,
+                "semester_exam": 16,
+                "final_exam": 18
+              },
+              "final_average": 16.33,
+              "status": "approved"
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/grades/{grade}",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "student_id": "integer (opcional, existe em students)",
+            "subject_id": "integer (opcional, existe em subjects)",
+            "class_id": "integer (opcional, existe em classes)",
+            "trimester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "semester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "final_exam": "numeric (opcional, nullable, min:0, max:20)"
+          },
+          "response": {
+            "success": true,
+            "message": "Nota atualizada com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174009",
+              "evaluations": {
+                "trimester_exam": 17,
+                "semester_exam": 18,
+                "final_exam": 19
+              },
+              "final_average": 18,
+              "status": "approved"
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/grades/{grade}",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Nota eliminada com sucesso.",
+            "data": null
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/enrollments",
+          "controlador": "Api\\V1\\EnrollmentController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Enrollments listed successfully.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174010",
+                "academic_year": "2023",
+                "semester": 1,
+                "enrollment_date": "2023-01-15",
+                "status": "active"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/admin/enrollments",
+          "controlador": "Api\\V1\\EnrollmentController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "student_id": "integer (obrigatório, existe em students)",
+            "course_id": "integer (obrigatório, existe em courses)",
+            "school_class_id": "integer (obrigatório, existe em school_classes)",
+            "academic_year": "string (obrigatório, max:20)",
+            "semester": "integer (obrigatório, min:1, max:2)",
+            "capacity": "integer (opcional, nullable, min:1)",
+            "shift": "string (opcional, nullable, em: morning, afternoon, evening)",
+            "status": "string (opcional, em: active, suspended, cancelled, completed)",
+            "enrollment_date": "date (opcional, nullable)"
+          },
+          "response": {
+            "success": true,
+            "message": "Enrollment created successfully.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174010",
+              "academic_year": "2023",
+              "semester": 1,
+              "enrollment_date": "2023-01-15",
+              "status": "active"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/admin/enrollments/{enrollment}",
+          "controlador": "Api\\V1\\EnrollmentController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Enrollment retrieved successfully.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174010",
+              "academic_year": "2023",
+              "semester": 1,
+              "enrollment_date": "2023-01-15",
+              "status": "active"
+            }
+          }
+        },
+        {
+          "metodo": "PUT",
+          "caminho": "/api/admin/enrollments/{enrollment}",
+          "controlador": "Api\\V1\\EnrollmentController",
+          "acao": "update",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": {
+            "student_id": "integer (opcional, existe em students)",
+            "school_class_id": "integer (opcional, existe em school_classes)",
+            "academic_year": "string (opcional, max:20)",
+            "semester": "integer (opcional, min:1, max:2)",
+            "enrollment_date": "date (opcional, nullable)",
+            "status": "string (opcional, em: active, suspended, cancelled, completed)"
+          },
+          "response": {
+            "success": true,
+            "message": "Enrollment updated successfully.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174010",
+              "academic_year": "2023",
+              "semester": 1,
+              "enrollment_date": "2023-01-15",
+              "status": "completed"
+            }
+          }
+        },
+        {
+          "metodo": "DELETE",
+          "caminho": "/api/admin/enrollments/{enrollment}",
+          "controlador": "Api\\V1\\EnrollmentController",
+          "acao": "destroy",
+          "middleware": ["auth:sanctum", "active", "role:admin"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Enrollment deleted successfully.",
+            "data": null
+          }
+        }
+      ],
+      "teacher": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "teacher",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Operação realizada com sucesso.",
+            "data": {}
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/grades",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Notas listadas com sucesso.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174009",
+                "evaluations": {
+                  "trimester_exam": 15,
+                  "semester_exam": 16,
+                  "final_exam": 18
+                },
+                "final_average": 16.33,
+                "status": "approved"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "POST",
+          "caminho": "/api/teacher/grades",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "store",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": {
+            "student_id": "integer (obrigatório, existe em alunos)",
+            "subject_id": "integer (obrigatório, existe em disciplinas)",
+            "class_id": "integer (obrigatório, existe em turmas)",
+            "trimester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "semester_exam": "numeric (opcional, nullable, min:0, max:20)",
+            "final_exam": "numeric (opcional, nullable, min:0, max:20)"
+          },
+          "response": {
+            "success": true,
+            "message": "Nota criada com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174009",
+              "evaluations": {
+                "trimester_exam": 15,
+                "semester_exam": 16,
+                "final_exam": 18
+              },
+              "final_average": 16.33,
+              "status": "approved"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/grades/{grade}",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Nota encontrada com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174009",
+              "evaluations": {
+                "trimester_exam": 15,
+                "semester_exam": 16,
+                "final_exam": 18
+              },
+              "final_average": 16.33,
+              "status": "approved"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/classes",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174007",
+                "name": "Class 1A",
+                "academic_year": "2023",
+                "semester": 1,
+                "capacity": 30,
+                "shift": "morning"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/classes/{school_class}",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174007",
+              "name": "Class 1A",
+              "academic_year": "2023",
+              "semester": 1,
+              "capacity": 30,
+              "shift": "morning"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/courses",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174006",
+                "name": "Computer Science",
+                "description": "Introduction to programming",
+                "duration": 4
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/subjects",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174008",
+                "name": "Mathematics",
+                "description": "Algebra and Calculus",
+                "hourly_load": 60
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/teacher/profile",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "meuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Perfil carregado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Mathematics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Teacher Name",
+                "email": "teacher@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        },
+        {
+          "metodo": "PATCH",
+          "caminho": "/api/teacher/profile",
+          "controlador": "Api\\V1\\TeacherController",
+          "acao": "actualizarMeuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:teacher"],
+          "body": {
+            "name": "string (opcional, max:255)",
+            "email": "string (opcional, email)",
+            "phone": "string (opcional, nullable, max:20)",
+            "specialty": "string (opcional, nullable, max:255)",
+            "birth_date": "date (opcional, nullable)"
+          },
+          "response": {
+            "success": true,
+            "message": "Perfil atualizado com sucesso.",
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174004",
+              "birth_date": "1985-05-15",
+              "specialty": "Physics",
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174005",
+                "name": "Updated Teacher",
+                "email": "updated-teacher@example.com",
+                "role": "teacher",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              }
+            }
+          }
+        }
+      ],
+      "student": [
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/dashboard",
+          "controlador": "Admin\\DashboardController",
+          "acao": "student",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Operação realizada com sucesso.",
+            "data": {}
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/profile",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "meuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Perfil carregado com sucesso.",
+            "data": {
+              "id": 1,
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                "name": "Student Name",
+                "email": "student@example.com",
+                "role": "student",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              },
+              "birth_date": "2000-01-01"
+            }
+          }
+        },
+        {
+          "metodo": "PATCH",
+          "caminho": "/api/student/profile",
+          "controlador": "Api\\V1\\StudentController",
+          "acao": "atualizarMeuPerfil",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": {
+            "name": "string (opcional)",
+            "email": "string (opcional, email)",
+            "birth_date": "date (opcional)",
+            "student_number": "string (opcional)",
+            "class_id": "integer (opcional)"
+          },
+          "response": {
+            "message": "Perfil atualizado com sucesso.",
+            "data": {
+              "id": 1,
+              "user": {
+                "uuid": "123e4567-e89b-12d3-a456-426614174001",
+                "name": "Updated Student",
+                "email": "updated-student@example.com",
+                "role": "student",
+                "profile_picture": null,
+                "phone": null,
+                "address": null,
+                "bi": null,
+                "gender": null
+              },
+              "birth_date": "2000-01-01"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/grades",
+          "controlador": "Api\\V1\\GradeController",
+          "acao": "minhasNotas",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "success": true,
+            "message": "Notas carregadas com sucesso.",
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174009",
+                "evaluations": {
+                  "trimester_exam": 15,
+                  "semester_exam": 16,
+                  "final_exam": 18
+                },
+                "final_average": 16.33,
+                "status": "approved"
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/classes/{school_class}",
+          "controlador": "Api\\V1\\SchoolClassController",
+          "acao": "show",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "data": {
+              "uuid": "123e4567-e89b-12d3-a456-426614174007",
+              "name": "Class 1A",
+              "academic_year": "2023",
+              "semester": 1,
+              "capacity": 30,
+              "shift": "morning"
+            }
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/courses",
+          "controlador": "Api\\V1\\CourseController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174006",
+                "name": "Computer Science",
+                "description": "Introduction to programming",
+                "duration": 4
+              }
+            ]
+          }
+        },
+        {
+          "metodo": "GET",
+          "caminho": "/api/student/subjects",
+          "controlador": "Api\\V1\\SubjectController",
+          "acao": "index",
+          "middleware": ["auth:sanctum", "active", "role:student"],
+          "body": null,
+          "response": {
+            "data": [
+              {
+                "uuid": "123e4567-e89b-12d3-a456-426614174008",
+                "name": "Mathematics",
+                "description": "Algebra and Calculus",
+                "hourly_load": 60
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
