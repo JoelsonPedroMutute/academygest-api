@@ -65,7 +65,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
             Route::apiResource('students', StudentController::class);
             Route::apiResource('teachers', TeacherController::class);
             Route::apiResource('courses', CourseController::class);
-            Route::apiResource('classes', SchoolClassController::class);
+            Route::apiResource('classes', SchoolClassController::class)->parameters([
+                'classes' => 'schoolClass'
+            ]);
             Route::apiResource('subjects', SubjectController::class);
             Route::apiResource('grades', GradeController::class);
             Route::apiResource('enrollments', EnrollmentController::class);
@@ -85,7 +87,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
             Route::get('grades/{grade}', [GradeController::class, 'show']);
 
             Route::get('classes', [SchoolClassController::class, 'index']);
-            Route::get('classes/{class}', [SchoolClassController::class, 'show']);
+            Route::get('classes/{schoolClass}', [SchoolClassController::class, 'show']);
 
             Route::get('courses', [CourseController::class, 'index']);
             Route::get('subjects', [SubjectController::class, 'index']);
@@ -108,7 +110,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
             Route::get('grades', [GradeController::class, 'myGrades']);
 
-            Route::get('classes/{class}', [SchoolClassController::class, 'show']);
+            Route::get('classes/{schoolClass}', [SchoolClassController::class, 'show']);
 
             Route::get('courses', [CourseController::class, 'index']);
             Route::get('subjects', [SubjectController::class, 'index']);
