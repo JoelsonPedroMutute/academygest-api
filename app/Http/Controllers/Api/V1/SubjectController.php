@@ -34,7 +34,7 @@ class SubjectController extends BaseController
         $this->authorize('view', $subject);
 
         $subject->load([
-            'courses',
+            'course',
             'teachers',
         ]);
 
@@ -51,7 +51,7 @@ class SubjectController extends BaseController
         );
 
         $subject->load([
-            'courses',
+            'course',
             'teachers',
         ]);
 
@@ -68,7 +68,7 @@ class SubjectController extends BaseController
         );
 
         $subject->load([
-            'courses',
+            'course',
             'teachers',
         ]);
 

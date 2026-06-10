@@ -63,6 +63,8 @@ class EnrollmentController extends BaseController
         $enrollment = $this->enrollmentService
             ->update($enrollment->id, $request->validated());
 
+        $enrollment->load(['student', 'schoolClass']);
+
         return $this->success(
             new EnrollmentResource($enrollment),
             'Enrollment updated successfully.'

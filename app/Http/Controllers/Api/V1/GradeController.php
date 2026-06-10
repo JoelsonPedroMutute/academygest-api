@@ -37,7 +37,7 @@ class GradeController extends BaseController
     {
         $this->authorize('view', $grade);
 
-        $grade->load(['students', 'disciplina', 'turma']);
+        $grade->load(['student', 'subject', 'schoolClass']);
 
         return $this->success(
             new GradeResource($grade),
@@ -53,7 +53,7 @@ class GradeController extends BaseController
 
         $grade = $this->gradeService->create($request->validated());
 
-        $grade->load(['students', 'subject', 'enrollment']);
+        $grade->load(['student', 'subject', 'schoolClass']);
 
         return $this->success(
             new GradeResource($grade),
@@ -69,7 +69,7 @@ class GradeController extends BaseController
             return $this->error('Aluno não encontrado para este utilizador', 404);
         }
 
-        $grades = Grade::with(['students', 'subject', 'enrollment'])
+        $grades = Grade::with(['student', 'subject', 'schoolClass'])
             ->where('aluno_id', $user->aluno->id)
             ->get();
 

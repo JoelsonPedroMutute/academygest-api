@@ -155,4 +155,26 @@ class TeacherController extends BaseController
             'Docentes pendentes listados com sucesso.'
         );
     }
+
+    public function destroy(Teacher $teacher)
+    {
+        $this->authorize('delete', $teacher);
+
+        $this->teacherService->delete($teacher->id);
+
+        return $this->success(
+            null,
+            'Docente eliminado com sucesso.'
+        );
+    }
+
+    public function myProfile()
+    {
+        return $this->meuPerfil();
+    }
+
+    public function updateMyProfile(UpdateTeacherRequest $request)
+    {
+        return $this->actualizarMeuPerfil($request);
+    }
 }

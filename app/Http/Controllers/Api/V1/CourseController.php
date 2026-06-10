@@ -7,9 +7,7 @@ use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
-
 use App\Services\CourseService;
-
 
 class CourseController extends BaseController
 {
@@ -28,63 +26,48 @@ class CourseController extends BaseController
         return CourseResource::collection($courses);
     }
 
-
     public function show(Course $course)
     {
         $this->authorize('view', $course);
 
-        $course->load([
-            'disciplinas',
-            'turma',
-        ]);
+        $course->load(['subjects', 'classes']);
 
         return new CourseResource($course);
     }
-
 
     public function store(StoreCourseRequest $request)
     {
         $this->authorize('create', Course::class);
 
-        $course = $this->courseService->criar(
+        $course = $this->courseService->create(
             $request->validated()
         );
 
-        $course->load([
-            'disciplinas',
-            'turma',
-        ]);
+        $course->load(['subjects', 'classes']);
 
         return new CourseResource($course);
     }
-
 
     public function update(UpdateCourseRequest $request, Course $course)
     {
         $this->authorize('update', $course);
 
-        $course = $this->courseService->atualizar(
+        $course = $this->courseService->update(
             $course->id,
             $request->validated()
         );
 
-        $course->load([
-            'disciplinas',
-            'turma',
-        ]);
+        $course->load(['subjects', 'classes']);
 
         return new CourseResource($course);
     }
-
 
     public function destroy(Course $course)
     {
         $this->authorize('delete', $course);
 
-        $this->courseService->eliminar($course->id);
+        $this->courseService->delete($course->id);
 
-        return $this->success(
-            'Curso eliminado com sucesso.'
-        );
+        return $this->success(null, 'Course deleted successfully.');
     }
 }
