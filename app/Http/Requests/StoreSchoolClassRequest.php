@@ -26,7 +26,7 @@ class StoreSchoolClassRequest extends FormRequest
     {
         return [
             'name'       => 'required|string|max:255',
-            'course_id'   => 'required|integer|exists:courses,id',
+            'course_id'   => 'required|string|exists:courses,id',
             'academic_year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'semester'   => 'required|integer|min:1|max:2',
             'capacity' => 'nullable|integer|min:1',

@@ -25,7 +25,7 @@ class UpdateStudentRequest extends FormRequest
             'email'           => 'sometimes|email|max:255|unique:users,email,' . optional($student->user)->id,
             'password'        => 'sometimes|nullable|string|min:6|confirmed',
 
-            'school_class_id' => 'sometimes|integer|exists:school_classes,id',
+            'class_id'        => 'sometimes|uuid|exists:school_classes,id', // ← era school_class_id e integer
 
             'birth_date'      => 'sometimes|date|before:today',
 

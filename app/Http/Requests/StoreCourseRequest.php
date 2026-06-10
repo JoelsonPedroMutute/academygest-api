@@ -2,45 +2,35 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Course;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCourseRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Course::class);
+        return $this->user()->can('create', \App\Models\Course::class);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:cursos',
-            'duration' => 'nullable|integer|min:1|max:10',
+            'name'        => 'required|string|max:255|unique:courses,name',
+            'duration'    => 'nullable|integer|min:1|max:10',
             'description' => 'nullable|string',
-
         ];
     }
+
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome do curso é obrigatório.',
-            'name.string' => 'O nome do curso deve ser uma string.',
-            'name.max' => 'O nome do curso deve ter no máximo 255 caracteres.',
-            'name.unique' => 'Este nome de curso já está em uso.',
-            'description.string' => 'A descrição do curso deve ser uma string.',
-            'duration.integer' => 'A duração do curso deve ser um número inteiro.',
-            'duration.min' => 'A duração do curso deve ser no mínimo 1 ano.',
-
+            'name.required' => 'Course name is required.',
+            'name.string'   => 'Course name must be a string.',
+            'name.max'      => 'Course name must not exceed 255 characters.',
+            'name.unique'   => 'This course name is already in use.',
+            'description.string' => 'Description must be a string.',
+            'duration.integer'   => 'Duration must be an integer.',
+            'duration.min'       => 'Duration must be at least 1 year.',
+            'duration.max'       => 'Duration must not exceed 10 years.',
         ];
     }
 }

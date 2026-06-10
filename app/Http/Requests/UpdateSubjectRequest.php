@@ -26,11 +26,11 @@ class UpdateSubjectRequest extends FormRequest
         $subject = $this->route('subject');
 
         return [
-            'name' => 'required|string|max:255|unique:disciplinas,nome,' . $subject->id,
+            'name' => 'required|string|max:255|unique:subjects,name,' . $subject->id,
             'description' => 'nullable|string',
+            'course_id' => 'required|exists:courses,id',
         ];
     }
-
     public function messages(): array
     {
         return [
